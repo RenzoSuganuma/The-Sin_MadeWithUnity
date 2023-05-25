@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +17,13 @@ public class PlayerController : MonoBehaviour
     /// <summary> 振り向きベクトル入力値の代入先 </summary>
     Vector2 _lookVector = Vector2.zero;
 
+    /// <summary> これが真の値の時には懐中電灯はついているようにする </summary>
+    private bool _illuminate = !true;
+    /// <summary> Lightコンポーネント　ここではプレイヤーの懐中電灯のコンポーネント </summary>
+    Light _light;
+    /// <summary> プレイヤーの懐中電灯のオブジェクト </summary>
+    GameObject _flashLight;
+
     /// <summary> 移動速度float型引数 </summary>
     [Tooltip("移動速度float型引数")]
     [SerializeField] private float _moveSpeed = 1.0f;
@@ -31,6 +39,8 @@ public class PlayerController : MonoBehaviour
             _playerInput = player;//入手したコンポーネントの送信
             _playerInput.defaultActionMap = "Player";//DefaultMapの初期化
         }
+        else
+            Debug.LogError("The Component PlayerInput Is Not Found");
 
         if (TryGetComponent<Rigidbody>(out Rigidbody rigid))//Digidbodyコンポーネントがあるかチェック、あるならゲットする
         {
@@ -43,12 +53,23 @@ public class PlayerController : MonoBehaviour
             _rigidbody.isKinematic = !true;
             _rigidbody.freezeRotation = true;
         }
+        else
+            Debug.LogError("The Component Rigidbody Is Not Found");
+
+        { _flashLight = GameObject.FindGameObjectWithTag("FlashLight"); }//懐中電灯のオブジェクトの検索
+        if (_flashLight.TryGetComponent<Light>(out Light light))//Lightコンポーネントの検索
+            _light = light;
+        else
+            Debug.LogError("The Component Light Is Not Found");
+
+        new MouseCursoreLocker();//マウスカーソルのロック
     }
 
     private void FixedUpdate()
     {
-        new PlayerMover(this.gameObject, _rigidbody, _moveVector, _moveSpeed);//移動
-        new PlayerLooker(this.gameObject.transform, _lookVector, _lookSpeed);
+        new PlayerMover(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
+        new PlayerLooker(this.gameObject.transform, this._lookVector, this._lookSpeed);//振り向き
+        new FlushLightController(this._light, this._illuminate);//懐中電灯のONOFF
     }
 
     /// <summary>
@@ -76,6 +97,12 @@ public class PlayerController : MonoBehaviour
             //print($"{_lookVector} : InputDevice - InputValue : Look");//デバッグ用
         }
     }
+
+    public void OnFire(InputAction.CallbackContext context)
+    {
+        _illuminate = context.ReadValueAsButton();//マウスボタン左のクリックの状態の格納
+        //print($"{_illuminate} : is Illuminate");//デバッグ用
+    }
 }
 
 /// <summary>
@@ -87,21 +114,46 @@ public class PlayerMover
     {
         if (moveVector != Vector2.zero)
         {
-            rigidbody.WakeUp();
-            rigidbody.AddForce(playerObject.transform.forward * moveVector.y *  moveSpeed * .01f, ForceMode.Impulse);
-            rigidbody.AddForce(playerObject.transform.right * moveVector.x *  moveSpeed * .01f, ForceMode.Impulse);
+            rigidbody.WakeUp();//何かしらの入力値があった力を加える
+            rigidbody.AddForce(playerObject.transform.forward * moveVector.y *  moveSpeed * .01f, ForceMode.Impulse);//前後の移動　正面が変動するのでその時々の正面基準で動く
+            rigidbody.AddForce(playerObject.transform.right * moveVector.x *  moveSpeed * .01f, ForceMode.Impulse);//左右の移動　正面が変動するのでその時々の正面基準で動く
         }
         else
         {
-            rigidbody.Sleep();
+            rigidbody.Sleep();//何も入力値がないので力は加えない
         }
     }
 }
 
+/// <summary>
+/// プレイヤー振り向き移動用クラス
+/// </summary>
 public class PlayerLooker
 {
     public PlayerLooker(Transform transform, Vector2 lookVector, float lookSpeed)
     {
         transform.Rotate(new Vector3(0, lookVector.x * lookSpeed * .5f, 0));
+    }
+}
+
+/// <summary>
+/// マウスカーソル固定用クラス
+/// </summary>
+public class MouseCursoreLocker
+{
+    public MouseCursoreLocker()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+}
+
+/// <summary>
+/// 懐中電灯操作クラス
+/// </summary>
+public class FlushLightController
+{
+    public FlushLightController(Light light, bool lightOrnot)
+    {
+        light.enabled = lightOrnot;
     }
 }
