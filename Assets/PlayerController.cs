@@ -4,6 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent (typeof(PlayerInput))]
+[RequireComponent (typeof(CapsuleCollider))]
+/// <summary>
+/// プレイヤー操作用のクラス ver - alpha
+/// </summary>
+/// 
 public class PlayerController : MonoBehaviour
 {
     /// <summary> InputSystem の PlayerInputコンポーネント </summary>
@@ -11,6 +18,9 @@ public class PlayerController : MonoBehaviour
 
     /// <summary> キャラ移動に使う </summary>
     Rigidbody _rigidbody;
+
+    /// <summary> キャラ移動に使うコライダー </summary>
+    CapsuleCollider _capsuleCollider;
 
     /// <summary> 移動ベクトル入力値の代入先 </summary>
     Vector2 _moveVector = Vector2.zero;
@@ -31,7 +41,11 @@ public class PlayerController : MonoBehaviour
     [Tooltip("振り向き速度float型引数")]
     [SerializeField] private float _lookSpeed = 1.0f;
 
+    /// <summary> プレイヤーのカメラのオブジェクト </summary>
     GameObject _playerCamera;
+
+    /// <summary> 懐中電灯をつけてるか判定フラグ : 敵オブジェクトの有効無効判断用 読み込み専用 </summary>
+    public bool _flashLightIsOn = true;
 
 
     private void Start()
@@ -58,13 +72,26 @@ public class PlayerController : MonoBehaviour
         else
             Debug.LogError("The Component Rigidbody Is Not Found");
 
+        if (TryGetComponent<CapsuleCollider>(out CapsuleCollider capsule))//Digidbodyコンポーネントがあるかチェック、あるならゲットする
+        {
+            //各パラメーターの初期化
+            _capsuleCollider = capsule;
+            _capsuleCollider.radius = .3f;
+            _capsuleCollider.height = 1.5f;
+        }
+        else
+            Debug.LogError("The Component CapsuleCollider Is Not Found");
+
+
         { _flashLight = GameObject.FindGameObjectWithTag("FlashLight"); }//懐中電灯のオブジェクトの検索
         if (_flashLight.TryGetComponent<Light>(out Light light))//Lightコンポーネントの検索
             _light = light;
         else
             Debug.LogError("The Component Light Is Not Found");
 
+
         { _playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera"); }
+
 
         new MouseCursoreLocker();//マウスカーソルのロック
     }
@@ -75,6 +102,9 @@ public class PlayerController : MonoBehaviour
         new PlayerLooker(this.gameObject.transform, this._lookVector, this._lookSpeed);//振り向き
         new FlushLightController(this._light, this._illuminate);//懐中電灯のONOFF
         new PlayerCameraController(this._playerCamera, this._lookVector, this._lookSpeed, 30f);//カメラ上下回転
+
+
+        { _flashLightIsOn = _illuminate; }//ほかクラスから懐中電灯のステータスをスコープするため
     }
 
     /// <summary>
@@ -103,6 +133,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 懐中電灯をつける入力受取関数
+    /// </summary>
+    /// <param name="context"></param>
     public void OnFire(InputAction.CallbackContext context)
     {
         _illuminate = context.ReadValueAsButton();//マウスボタン左のクリックの状態の格納
@@ -178,13 +212,13 @@ public class PlayerCameraController
         _localAngle.x += -lookVector.y * lookSpeed * .1f;
         if (_localAngle.x > maxLimit && _localAngle.x < 180)//maxLimit[Deg] ~ 180[Deg]
         {
-            Debug.Log("MaxLimit!");
+            //Debug.Log("MaxLimit!");
             _localAngle.x = maxLimit;
         }
 
         if (_localAngle.x < _minLimit && _localAngle.x > 180)//minLimit[Deg] ~ 180[Deg]
         {
-            Debug.Log("MinLimit!");
+            //Debug.Log("MinLimit!");
             _localAngle.x = _minLimit;
         }
 
