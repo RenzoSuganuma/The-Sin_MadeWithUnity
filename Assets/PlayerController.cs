@@ -31,6 +31,8 @@ public class PlayerController : MonoBehaviour
     [Tooltip("振り向き速度float型引数")]
     [SerializeField] private float _lookSpeed = 1.0f;
 
+    GameObject _playerCamera;
+
 
     private void Start()
     {
@@ -62,6 +64,8 @@ public class PlayerController : MonoBehaviour
         else
             Debug.LogError("The Component Light Is Not Found");
 
+        { _playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera"); }
+
         new MouseCursoreLocker();//マウスカーソルのロック
     }
 
@@ -70,6 +74,7 @@ public class PlayerController : MonoBehaviour
         new PlayerMover(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
         new PlayerLooker(this.gameObject.transform, this._lookVector, this._lookSpeed);//振り向き
         new FlushLightController(this._light, this._illuminate);//懐中電灯のONOFF
+        new PlayerCameraController(this._playerCamera, this._lookVector, this._lookSpeed, 30f);//カメラ上下回転
     }
 
     /// <summary>
@@ -155,5 +160,34 @@ public class FlushLightController
     public FlushLightController(Light light, bool lightOrnot)
     {
         light.enabled = lightOrnot;
+    }
+}
+
+/// <summary>
+/// カメラの制御クラス
+/// </summary>
+public class PlayerCameraController
+{
+    private float _minLimit = 0f;
+    private Vector3 _localAngle = Vector3.zero;
+    public PlayerCameraController(GameObject gameObject, Vector2 lookVector, float lookSpeed, float maxLimit)
+    {
+        //上方向に向かって回転＝負の数　下方向に向かって回転＝正の数 -180[Deg] ~ 180[Deg]
+        _minLimit = 360 - maxLimit;
+        _localAngle = gameObject.transform.localEulerAngles;
+        _localAngle.x += -lookVector.y * lookSpeed * .1f;
+        if (_localAngle.x > maxLimit && _localAngle.x < 180)//maxLimit[Deg] ~ 180[Deg]
+        {
+            Debug.Log("MaxLimit!");
+            _localAngle.x = maxLimit;
+        }
+
+        if (_localAngle.x < _minLimit && _localAngle.x > 180)//minLimit[Deg] ~ 180[Deg]
+        {
+            Debug.Log("MinLimit!");
+            _localAngle.x = _minLimit;
+        }
+
+        gameObject.transform.localEulerAngles = _localAngle;
     }
 }
