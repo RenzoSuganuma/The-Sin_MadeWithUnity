@@ -8,7 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CapsuleCollider))]
 
-public class EnemyController : MonoBehaviour
+public class SpectorController : MonoBehaviour
 {
     /// <summary> 敵オブジェクト操作用のRigidbody </summary>
     Rigidbody _rb;
@@ -31,7 +31,7 @@ public class EnemyController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        this.gameObject.transform.LookAt(_playerGameObject.transform.position);//プレイヤーオブジェクトを向く
+        this.gameObject.transform.LookAt(_playerGameObject.transform.position, _playerGameObject.transform.up);//プレイヤーオブジェクトを向く
         _rb.velocity = this.transform.forward * .5f;//正面に移動
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 /// このクラスは敵オブジェクトの実体にアタッチしないこと。敵キャラマネージャーとして機能 ver - alpha
 /// </summary>
 
-public class EnemyManager : MonoBehaviour
+public class SpectorManager : MonoBehaviour
 {
     /// <summary> プレイヤー操作用のクラス </summary>
     PlayerController _playerController;
