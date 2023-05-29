@@ -8,6 +8,7 @@ TagManager:
   - Lantern
   - PlayerCamera
   - Enemy
+  - SoundEffect
   layers:
   - Default
   - TransparentFX

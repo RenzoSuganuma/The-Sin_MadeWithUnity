@@ -47,6 +47,17 @@ public class PlayerController : MonoBehaviour
     /// <summary> 懐中電灯をつけてるか判定フラグ : 敵オブジェクトの有効無効判断用 読み込み専用 </summary>
     public bool _flashLightIsOn = true;
 
+    /// <summary> SE用のオブジェクトのタグが紐づけされてるオブジェクト格納用 </summary>
+    GameObject[] _compareTagSoundEffect;
+    /// <summary> プレイヤー歩行時の効果音再生用のオブジェクト格納用 </summary>
+    GameObject _walkingSoundEffectObject = null;
+
+    PlayerMover _playerMover;
+    PlayerLooker _playerLooker;
+    MouseCursoreLocker _cursoreLocker;
+    FlushLightController _flushLightController;
+    PlayerCameraController _playerCameraController;
+    WalkingSoundEffectController _walkingSoundEffectController;
 
     private void Start()
     {
@@ -93,18 +104,41 @@ public class PlayerController : MonoBehaviour
         { _playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera"); }
 
 
-        new MouseCursoreLocker();//マウスカーソルのロック
+        _compareTagSoundEffect = GameObject.FindGameObjectsWithTag("SoundEffect");//効果音用のタグがアタッチされているオブジェクト（配列）を検索
+        foreach (GameObject @object in _compareTagSoundEffect)//ボトムからトップまでの要素のチェック
+        {
+            if (@object.CompareTag("SoundEffect") && @object.name == "Walk_SE")//特定の条件を満たすオブジェクトを見つけた場合
+            {
+                _walkingSoundEffectObject = @object; // 変数にオブジェクトを格納
+                break; // 条件を満たすオブジェクトが見つかったらループを終了
+            }
+        }
+
+        _cursoreLocker = new MouseCursoreLocker();
+        _cursoreLocker.MouseCursoreLock();//マウスカーソルのロック
+
+        _flushLightController = new FlushLightController();
+        _playerMover = new PlayerMover();
+        _playerLooker = new PlayerLooker();
+        _playerCameraController = new PlayerCameraController();
+        _walkingSoundEffectController = new WalkingSoundEffectController();
+    }
+
+    private void Update()
+    {
+        //_timer.UpdateTimer();
+        //Debug.Log($"timer is pausing : {_timer.isTimerPaused}");
     }
 
     private void FixedUpdate()
     {
-        new PlayerMover(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
-        new PlayerLooker(this.gameObject.transform, this._lookVector, this._lookSpeed);//振り向き
-        new FlushLightController(this._light, this._illuminate);//懐中電灯のONOFF
-        new PlayerCameraController(this._playerCamera, this._lookVector, this._lookSpeed, 30f);//カメラ上下回転
-
-
         { _flashLightIsOn = _illuminate; }//ほかクラスから懐中電灯のステータスをスコープするため
+
+        _playerMover.PlayerMove(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
+        _playerLooker.PlayerLooking(this.gameObject.transform, this._lookVector, this._lookSpeed);//振り向き
+        _flushLightController.FlushLightLight(this._light, this._illuminate);//懐中電灯のONOFF
+        _playerCameraController.PlayerCameraMove(this._playerCamera, this._lookVector, this._lookSpeed, 30f);//カメラ上下回転
+        _walkingSoundEffectController.WalkingSoundEffectPlayStatusSet(this._walkingSoundEffectObject, this._moveVector);//歩行効果音操作
     }
 
     /// <summary>
@@ -149,13 +183,13 @@ public class PlayerController : MonoBehaviour
 /// </summary>
 public class PlayerMover
 {
-    public PlayerMover(GameObject playerObject, Rigidbody rigidbody, Vector2 moveVector, float moveSpeed)
+    public void PlayerMove(GameObject playerObject, Rigidbody rigidbody, Vector2 moveVector, float moveSpeed)
     {
         if (moveVector != Vector2.zero)
         {
             rigidbody.WakeUp();//何かしらの入力値があった力を加える
-            rigidbody.AddForce(playerObject.transform.forward * moveVector.y *  moveSpeed * .01f, ForceMode.Impulse);//前後の移動　正面が変動するのでその時々の正面基準で動く
-            rigidbody.AddForce(playerObject.transform.right * moveVector.x *  moveSpeed * .01f, ForceMode.Impulse);//左右の移動　正面が変動するのでその時々の正面基準で動く
+            rigidbody.AddForce(playerObject.transform.forward * moveVector.y * moveSpeed * .01f, ForceMode.Impulse);//前後の移動　正面が変動するのでその時々の正面基準で動く
+            rigidbody.AddForce(playerObject.transform.right * moveVector.x * moveSpeed * .01f, ForceMode.Impulse);//左右の移動　正面が変動するのでその時々の正面基準で動く
         }
         else
         {
@@ -169,7 +203,7 @@ public class PlayerMover
 /// </summary>
 public class PlayerLooker
 {
-    public PlayerLooker(Transform transform, Vector2 lookVector, float lookSpeed)
+    public void PlayerLooking(Transform transform, Vector2 lookVector, float lookSpeed)
     {
         transform.Rotate(new Vector3(0, lookVector.x * lookSpeed * .5f, 0));
     }
@@ -180,7 +214,7 @@ public class PlayerLooker
 /// </summary>
 public class MouseCursoreLocker
 {
-    public MouseCursoreLocker()
+    public void MouseCursoreLock()
     {
         Cursor.lockState = CursorLockMode.Locked;
     }
@@ -191,9 +225,26 @@ public class MouseCursoreLocker
 /// </summary>
 public class FlushLightController
 {
-    public FlushLightController(Light light, bool lightOrnot)
+    private static float _batteryLife = 100f;
+    public void FlushLightLight(Light light, bool lightOrnot)
     {
-        light.enabled = lightOrnot;
+        if (_batteryLife > 0)
+        {
+            light.enabled = lightOrnot;
+            _batteryLife -= Time.deltaTime;
+            if(lightOrnot) _batteryLife -= Time.deltaTime * 1.5f;
+            Debug.Log($"current battery life : {_batteryLife}");
+        }
+        else
+        {
+            Debug.Log($"current battery is death");
+        }
+    }
+
+    public void FlashLightBatteryCharge(float batteryPower)
+    {
+        _batteryLife = batteryPower;
+        Debug.Log($"battery charged");
     }
 }
 
@@ -204,7 +255,7 @@ public class PlayerCameraController
 {
     private float _minLimit = 0f;
     private Vector3 _localAngle = Vector3.zero;
-    public PlayerCameraController(GameObject gameObject, Vector2 lookVector, float lookSpeed, float maxLimit)
+    public void PlayerCameraMove(GameObject gameObject, Vector2 lookVector, float lookSpeed, float maxLimit)
     {
         //上方向に向かって回転＝負の数　下方向に向かって回転＝正の数 -180[Deg] ~ 180[Deg]
         _minLimit = 360 - maxLimit;
@@ -223,5 +274,63 @@ public class PlayerCameraController
         }
 
         gameObject.transform.localEulerAngles = _localAngle;
+    }
+}
+
+/// <summary>
+/// プレイヤー歩行時のSE再生用クラス
+/// </summary>
+public class WalkingSoundEffectController
+{
+    public void WalkingSoundEffectPlayStatusSet(GameObject gameObject,Vector2 moveVector)
+    {
+        if(moveVector != Vector2.zero)
+        {
+            gameObject.SetActive(true);
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
+    }
+}
+
+/// <summary>
+/// タイマーのクラス
+/// </summary>
+public class Timer
+{
+    public float targetTime = 10.0f; // 目標時間（秒）
+    private float currentTime = 0.0f; // 現在の経過時間
+
+    private bool isTimerRunning = false; // タイマーが動作中かどうか
+    public bool isTimerPaused = false;
+
+    public void UpdateTimer()
+    {
+        if (isTimerRunning)
+        {
+            currentTime += Time.deltaTime; // 経過時間を更新
+            Debug.Log($"CurrentTime : {currentTime}");
+            if (currentTime >= targetTime)
+            {
+                // 目標時間を経過したら、メッセージを表示
+                Debug.Log("Time's up!");
+
+                // タイマーを停止する（任意の処理を行う場合はここに追加）
+                isTimerRunning = false;
+                isTimerPaused = !isTimerRunning;//公開変数の値設定
+            }
+        }
+    }
+
+    public void StartTimer()
+    {
+        // タイマーを開始する（任意の処理を行う場合はここに追加）
+        isTimerRunning = true;
+        isTimerPaused = !isTimerRunning;//公開変数の値設定
+
+        // 経過時間をリセット
+        currentTime = 0.0f;
     }
 }
