@@ -1,9 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-
+using System.Collections;
+using System.Collections.Generic;
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent (typeof(PlayerInput))]
 [RequireComponent (typeof(CapsuleCollider))]

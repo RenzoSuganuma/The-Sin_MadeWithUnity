@@ -1,7 +1,6 @@
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-
 /// <summary>
 /// このクラスは敵オブジェクトの実体にアタッチしないこと。敵キャラマネージャーとして機能 ver - alpha
 /// </summary>

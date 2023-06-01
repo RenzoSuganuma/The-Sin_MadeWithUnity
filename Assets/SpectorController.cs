@@ -1,7 +1,6 @@
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-
 /// <summary>
 /// 敵キャラ操作用クラス ver - alpha
 /// </summary>
