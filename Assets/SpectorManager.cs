@@ -24,7 +24,7 @@ public class SpectorManager : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        _playerIsLighting = _playerFlashLight.GetComponent<Light>().enabled;//プレイヤー操作用のクラスからの懐中電灯のフラグの受信
+        _playerIsLighting = _playerFlashLight.GetComponent<Light>().enabled;//プレイヤー操作用のクラスからの懐中電灯のLightコンポーネントのOnOFFを監視、コンディションの取得
         if (_playerIsLighting)//懐中電灯をつけているうちにはこのオブジェクトは無効
         {
             foreach(GameObject obj in _enemyObject)

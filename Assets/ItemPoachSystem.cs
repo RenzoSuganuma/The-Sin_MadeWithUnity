@@ -1,21 +1,25 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+/// <summary>
+/// インベントリシステム用のクラス ver - alpha
+/// </summary>
 public class ItemPoachSystem : MonoBehaviour
 {
-    ChildObjectsManager _objectsGetter;
-    [SerializeField] GameObject[] _test = null;
+    /// <summary> 子オブジェクトのマネージャクラス </summary>
+    ChildObjectsManager _objectsManager;
+    [SerializeField] GameObject[] _gameObject_DEBUGGING;//デバッグ用変数
     // Start is called before the first frame update
     void Start()
     {
-        _objectsGetter = new ChildObjectsManager();
+        _objectsManager = new ChildObjectsManager();//クラスの使用
     }
 
     // Update is called once per frame
     void Update()
     {
-        _test = _objectsGetter.GetChildObjects(gameObject);
-        _objectsGetter.MakeChildToParent(_test);
+        //_gameObject_DEBUGGING = _objectsManager.GetChildObjects(this.gameObject);
+        //_objectsManager.MakeChildToParent(_gameObject_DEBUGGING);
     }
 }
 
@@ -31,11 +35,14 @@ public class ChildObjectsManager
     /// <returns></returns>
     public GameObject[] GetChildObjects(GameObject parentObject)
     {
-        // 子オブジェクトを格納する配列作成
+        // 子オブジェクトのトランスフォームを格納する配列作成
         var _children = new Transform[parentObject.transform.childCount];//添え字が変動する
-        int childIndex = 0;
+        int childIndex = 0;//添え字
+
+        // 子オブジェクトを格納する配列作成
         GameObject[] _returnObjects = new GameObject[parentObject.transform.childCount];//添え字が変動する
-        int convertingIndex = 0;
+        int convertingIndex = 0;//添え字
+
         // 子オブジェクトを順番に配列に格納
         foreach (Transform child in parentObject.transform)
         {
@@ -59,7 +66,7 @@ public class ChildObjectsManager
     /// <param name="childObject"></param>
     public void MakeChildToParent(GameObject childObject)
     {
-        if(childObject != null)
+        if(childObject != null)//オブジェクトの中身のチェック
         {
             childObject.gameObject.transform.parent = null;
         }
@@ -71,7 +78,7 @@ public class ChildObjectsManager
     /// <param name="childObjects"></param>
     public void MakeChildToParent(GameObject[] childObjects)
     {
-        if (childObjects != null)
+        if (childObjects != null)//オブジェクトの中身のチェック
         {
             for(int i = 0; i < childObjects.Length; i++)
             {

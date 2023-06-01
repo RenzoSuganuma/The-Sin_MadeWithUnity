@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviour
     /// <summary> プレイヤー歩行時の効果音再生用のオブジェクト格納用 </summary>
     GameObject _walkingSoundEffectObject = null;
 
+    //以下プレイヤー操作に必要なクラス
     PlayerMover _playerMover;
     PlayerLooker _playerLooker;
     MouseCursoreLocker _cursoreLocker;
