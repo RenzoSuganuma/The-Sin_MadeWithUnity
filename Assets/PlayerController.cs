@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviour
     PlayerMover _playerMover;
     PlayerLooker _playerLooker;
     MouseCursoreLocker _cursoreLocker;
-    FlushLightController _flushLightController;
+    FlashLightController _flashLightController;
     PlayerCameraController _playerCameraController;
     WalkingSoundEffectController _walkingSoundEffectController;
 
@@ -114,10 +114,10 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        _cursoreLocker = new MouseCursoreLocker();
+        _cursoreLocker = new MouseCursoreLocker();//マウスカーソルのロック用クラス使用
         _cursoreLocker.MouseCursoreLock();//マウスカーソルのロック
 
-        _flushLightController = new FlushLightController();
+        _flashLightController = new FlashLightController();
         _playerMover = new PlayerMover();
         _playerLooker = new PlayerLooker();
         _playerCameraController = new PlayerCameraController();
@@ -126,8 +126,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        //_timer.UpdateTimer();
-        //Debug.Log($"timer is pausing : {_timer.isTimerPaused}");
+        
     }
 
     private void FixedUpdate()
@@ -136,7 +135,7 @@ public class PlayerController : MonoBehaviour
 
         _playerMover.PlayerMove(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
         _playerLooker.PlayerLooking(this.gameObject.transform, this._lookVector, this._lookSpeed);//振り向き
-        _flushLightController.FlushLightLight(this._light, this._illuminate);//懐中電灯のONOFF
+        _flashLightController.FlushLightLight(this._light, this._illuminate);//懐中電灯のONOFF
         _playerCameraController.PlayerCameraMove(this._playerCamera, this._lookVector, this._lookSpeed, 30f);//カメラ上下回転
         _walkingSoundEffectController.WalkingSoundEffectPlayStatusSet(this._walkingSoundEffectObject, this._moveVector);//歩行効果音操作
     }
@@ -223,9 +222,9 @@ public class MouseCursoreLocker
 /// <summary>
 /// 懐中電灯操作クラス
 /// </summary>
-public class FlushLightController
+public class FlashLightController
 {
-    private static float _batteryLife = 100f;
+    private static float _batteryLife = 10f;
     public void FlushLightLight(Light light, bool lightOrnot)
     {
         if (_batteryLife > 0)
@@ -237,6 +236,7 @@ public class FlushLightController
         }
         else
         {
+            light.enabled = false;
             Debug.Log($"current battery is death");
         }
     }

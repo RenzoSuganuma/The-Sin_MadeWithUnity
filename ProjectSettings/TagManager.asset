@@ -7,8 +7,8 @@ TagManager:
   - FlashLight
   - Lantern
   - PlayerCamera
-  - Enemy
   - SoundEffect
+  - Spector_Enemy
   layers:
   - Default
   - TransparentFX

@@ -8,29 +8,34 @@ using UnityEngine;
 
 public class SpectorManager : MonoBehaviour
 {
-    /// <summary> プレイヤー操作用のクラス </summary>
-    PlayerController _playerController;
-
     /// <summary> プレイヤーが懐中電灯をつけてるかのフラグ </summary>
     private bool _playerIsLighting = false;
 
-    /// <summary> 敵のオブジェクト </summary>
-    [SerializeField] GameObject _enemyObject = null;
+    /// <summary> 敵のオブジェクト配列 </summary>/// 
+    [SerializeField] GameObject[] _enemyObject = null;
+    /// <summary> スマホの懐中電灯のオブジェクト </summary>
+    [SerializeField] GameObject _playerFlashLight = null;
 
     private void Start()
     {
-        if(GameObject.FindGameObjectWithTag("Player").TryGetComponent<PlayerController>(out PlayerController playerController))//プレイヤーオブジェクトの検索
-            _playerController = playerController;
+        _playerFlashLight = GameObject.FindGameObjectWithTag("FlashLight");
+        _enemyObject = GameObject.FindGameObjectsWithTag("Spector_Enemy");//Spector＿Enemyのタグの紐づけされている敵すべて検索
     }
 
     // Update is called once per frame
     private void Update()
     {
-        _playerIsLighting = _playerController._flashLightIsOn;//プレイヤー操作用のクラスからの懐中電灯のフラグの受信
+        _playerIsLighting = _playerFlashLight.GetComponent<Light>().enabled;//プレイヤー操作用のクラスからの懐中電灯のフラグの受信
         if (_playerIsLighting)//懐中電灯をつけているうちにはこのオブジェクトは無効
-            _enemyObject.SetActive(false);
+        {
+            foreach(GameObject obj in _enemyObject)
+                obj.SetActive(false);
+        }
         else
-            _enemyObject.SetActive(true);
+        {
+            foreach (GameObject obj in _enemyObject)
+                obj.SetActive(true);
+        } 
 
         //print($"{_playerIsLighting} : is player lighting status");
     }
