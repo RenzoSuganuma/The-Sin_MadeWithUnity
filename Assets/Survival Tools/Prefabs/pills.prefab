@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 33635792954584322}
   - component: {fileID: 23926808027532566}
   m_Layer: 0
-  m_Name: pills
+  m_Name: Pills
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

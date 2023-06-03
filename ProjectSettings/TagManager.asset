@@ -9,6 +9,8 @@ TagManager:
   - SoundEffect
   - Spector_Enemy
   - Battery
+  - Inventry_Poach
+  - FlashLight_Holder
   layers:
   - Default
   - TransparentFX

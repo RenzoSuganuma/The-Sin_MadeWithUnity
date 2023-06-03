@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent (typeof(PlayerInput))]
@@ -48,7 +47,7 @@ public class PlayerController : MonoBehaviour
     public bool _flashLightIsOn = true;
 
     /// <summary> プレイヤーがアイテムを拾った時 </summary>
-    public bool _pickkedNow = false;
+    public bool _pickkingNow = false;
 
     /// <summary> SE用のオブジェクトのタグが紐づけされてるオブジェクト格納用 </summary>
     GameObject[] _compareTagSoundEffect;
@@ -103,7 +102,7 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("The Component CapsuleCollider Is Not Found");
 
 
-        { _flashLight = GameObject.FindGameObjectWithTag("FlashLight"); }//懐中電灯のオブジェクトの検索
+        { _flashLight = GameObject.FindGameObjectWithTag("FlashLight"); }//懐中電灯のオブジェクトの検索//ここの参照の仕方をインベントリポーチからの検索、参照にすること。参照が終わればこんどはflashLightHolderにアタッチしてあげること
         if (_flashLight.TryGetComponent<Light>(out Light light))//Lightコンポーネントの検索
             _light = light;
         else
@@ -122,6 +121,9 @@ public class PlayerController : MonoBehaviour
                 break; // 条件を満たすオブジェクトが見つかったらループを終了
             }
         }
+
+        _itemPoach = GameObject.FindGameObjectWithTag("Inventry_Poach");//インベントリーのオブジェクトの検索
+        _flashLightHolder = GameObject.FindGameObjectWithTag("FlashLight_Holder");//フラッシュライトのオブジェクトの検索
 
         _cursoreLocker = new MouseCursoreLocker();//マウスカーソルのロック用クラス使用
         _cursoreLocker.MouseCursoreLock();//マウスカーソルのロック
@@ -145,7 +147,7 @@ public class PlayerController : MonoBehaviour
         _playerMover.PlayerMove(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
         _playerLooker.PlayerLooking(this.gameObject.transform, this._lookVector, this._lookSpeed);//振り向き
         _flashLightController.FlushLightLight(this._light, this._illuminate);//懐中電灯のONOFF
-        _playerCameraController.PlayerCameraMove(this._playerCamera, this._lookVector, this._lookSpeed, 30f);//カメラ上下回転
+        _playerCameraController.PlayerCameraMove(this._playerCamera, this._lookVector, this._lookSpeed, 45f);//カメラ上下回転
         _walkingSoundEffectController.WalkingSoundEffectPlayStatusSet(this._walkingSoundEffectObject, this._moveVector);//歩行効果音操作
     }
 
@@ -187,28 +189,42 @@ public class PlayerController : MonoBehaviour
 
     public void OnPick(InputAction.CallbackContext context)
     {
-        _pickkedNow = context.ReadValueAsButton();//キーボードEの入力値を格納
-        //Debug.Log("pikkedNOW" + _pickkedNow);
+        _pickkingNow = context.ReadValueAsButton();//キーボードEの入力値を格納
+        //Debug.Log("pikkedNOW" + _pickkingNow);
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
-        TriggeredObjectCheckToPickUp(other.gameObject);
-    }
-
-    public bool TriggeredObjectCheckToPickUp(GameObject triggeredObject)
-    {
-        List<string> _objectTagList = new List<string>() { "FlashLight", "Battery", "Empty" };
-        bool returnValue = !false;
-        if (triggeredObject != null)
+        if (TriggeredObjectCheckToPickUp(other.gameObject))
         {
-            string objectTag = triggeredObject.tag;
-            foreach (string tag in _objectTagList)
+            Debug.Log($"{other.name} Is Can Pick");
+            if (this._pickkingNow)
+            {
+                AttachToItemPoach(other.gameObject, this._itemPoach);
+                _flashLightController.FlashLightBatteryCharge(100f);
+                Debug.Log($"Picked {other.name}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// リストに登録してあるタグと照合して引数のオブジェクトがリストにあるものと同じタグを持っていればTrueを返す
+    /// </summary>
+    /// <param name="triggeredObject"></param>
+    /// <returns></returns>
+    private bool TriggeredObjectCheckToPickUp(GameObject triggeredObject)
+    {
+        List<string> _objectTagList = new List<string>() { "FlashLight", "Battery", "Empty" };//拾えるアイテムのタグのリスト
+        bool returnValue = true;
+        if (triggeredObject != null)//ひとまずnullチェック
+        {
+            string objectTag = triggeredObject.tag;//タグの送信
+            foreach (string tag in _objectTagList)//foreach検索
             {
                 Debug.Log("TriggeredObjectSearchingTAG : " + tag);
-                if (objectTag == tag)
+                if (objectTag == tag)//もし一致したら
                 {
-                    returnValue = true;
+                    returnValue = true;//返り値はtrueでこれ以降は検索をかけないのでbreakする。余計に検索を掛けると想定しない値が返る
                     break;
                 }
                 else
@@ -219,6 +235,18 @@ public class PlayerController : MonoBehaviour
         }
         Debug.Log("TriggeredObjectRETURN : " + returnValue);
         return returnValue;
+    }
+
+    /// <summary>
+    /// アイテムポーチにアイテムをアタッチしてアイテムポーチの配下にする
+    /// </summary>
+    /// <param name="itemObject"></param>
+    /// <param name="itemPoachObject"></param>
+    private void AttachToItemPoach(GameObject itemObject,GameObject itemPoachObject)
+    {
+        itemObject.transform.parent = itemPoachObject.transform;
+        itemPoachObject.transform.localPosition = Vector3.zero;//TransformをVector3.zeroにする
+        itemObject.SetActive(false);//非アクティブにして格納。プレイ途中で見えなくしたいため
     }
 }
 
@@ -269,26 +297,26 @@ public class MouseCursoreLocker
 /// </summary>
 public class FlashLightController
 {
-    private static float _batteryLife = 10f;
+    private static float _batteryLife = 10f;//バッテリーの寿命の初期値
     public void FlushLightLight(Light light, bool lightOrnot)
     {
-        if (_batteryLife > 0)
+        if (_batteryLife > 0)//バッテリー残量があるとき
         {
-            light.enabled = lightOrnot;
-            _batteryLife -= Time.deltaTime;
-            if(lightOrnot) _batteryLife -= Time.deltaTime * 1.5f;
+            light.enabled = lightOrnot;//点灯の入力値に応じてコンポーネントの有効無効を切り替え
+            _batteryLife -= Time.deltaTime;//通常消費
+            if(lightOrnot) _batteryLife -= Time.deltaTime * 1.5f;//点灯をすれば消費量は増えるから点灯時余分に消費
             Debug.Log($"current battery life : {_batteryLife}");
         }
         else
         {
-            light.enabled = false;
+            light.enabled = false;//点灯できないようにする
             Debug.Log($"current battery is death");
         }
     }
 
     public void FlashLightBatteryCharge(float batteryPower)
     {
-        _batteryLife = batteryPower;
+        _batteryLife = batteryPower;//バッテリーの寿命の回復をする
         Debug.Log($"battery charged");
     }
 }
@@ -329,7 +357,7 @@ public class WalkingSoundEffectController
 {
     public void WalkingSoundEffectPlayStatusSet(GameObject gameObject,Vector2 moveVector)
     {
-        if(moveVector != Vector2.zero)
+        if(moveVector != Vector2.zero)//歩行の入力の有無で歩行用SEのオブジェクトの有効無効を切り替え
         {
             gameObject.SetActive(true);
         }

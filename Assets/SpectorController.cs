@@ -39,4 +39,13 @@ public class SpectorController : MonoBehaviour
             _rb.velocity = this.transform.forward * .5f;//ê≥ñ Ç…à⁄ìÆ
         //Debug.Log(_isMadNow);
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            Debug.Log("Collided WITH Player");
+            Destroy(this.gameObject);
+        }
+    }
 }

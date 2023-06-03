@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 33260610115729954}
   - component: {fileID: 23448197922942252}
   m_Layer: 0
-  m_Name: tape
+  m_Name: Tape
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

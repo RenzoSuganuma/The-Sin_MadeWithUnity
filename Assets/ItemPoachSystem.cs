@@ -29,7 +29,7 @@ public class ItemPoachSystem : MonoBehaviour
 public class ChildObjectsManager
 {
     /// <summary>
-    /// 子オブジェクトの取得をしてGameObject型で返す関数
+    /// 子オブジェクトの取得をしてGameObject型で返す関数非アクティブでもOK
     /// </summary>
     /// <param name="parentObject"></param>
     /// <returns></returns>

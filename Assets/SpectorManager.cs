@@ -27,13 +27,25 @@ public class SpectorManager : MonoBehaviour
         _playerIsLighting = _playerFlashLight.GetComponent<Light>().enabled;//プレイヤー操作用のクラスからの懐中電灯のLightコンポーネントのOnOFFを監視、コンディションの取得
         if (_playerIsLighting)//懐中電灯をつけているうちにはこのオブジェクトは無効
         {
-            foreach(GameObject obj in _enemyObject)
-                obj.SetActive(false);
+            if (_enemyObject != null)//nullチェック
+            {
+                foreach (GameObject obj in _enemyObject)
+                {
+                    if (obj != null)//nullチェックしてからアクティブ状態の切り替え
+                        obj.SetActive(false);
+                }
+            }
         }
         else
         {
-            foreach (GameObject obj in _enemyObject)
-                obj.SetActive(true);
+            if(_enemyObject != null)
+            {
+                foreach (GameObject obj in _enemyObject)
+                {
+                    if(obj !=  null)//nullチェックしてからアクティブ状態の切り替え
+                        obj.SetActive(true);
+                }
+            }
         } 
 
         //print($"{_playerIsLighting} : is player lighting status");

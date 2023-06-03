@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 33776631017494956}
   - component: {fileID: 23419604003686264}
   m_Layer: 0
-  m_Name: cannedfood
+  m_Name: Cannedfood
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
