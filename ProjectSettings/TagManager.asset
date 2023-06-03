@@ -5,10 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - FlashLight
-  - Lantern
   - PlayerCamera
   - SoundEffect
   - Spector_Enemy
+  - Battery
   layers:
   - Default
   - TransparentFX

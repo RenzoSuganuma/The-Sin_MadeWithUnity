@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent (typeof(PlayerInput))]
 [RequireComponent (typeof(CapsuleCollider))]
@@ -45,10 +47,18 @@ public class PlayerController : MonoBehaviour
     /// <summary> 懐中電灯をつけてるか判定フラグ : 敵オブジェクトの有効無効判断用 読み込み専用 </summary>
     public bool _flashLightIsOn = true;
 
+    /// <summary> プレイヤーがアイテムを拾った時 </summary>
+    public bool _pickkedNow = false;
+
     /// <summary> SE用のオブジェクトのタグが紐づけされてるオブジェクト格納用 </summary>
     GameObject[] _compareTagSoundEffect;
     /// <summary> プレイヤー歩行時の効果音再生用のオブジェクト格納用 </summary>
     GameObject _walkingSoundEffectObject = null;
+
+    /// <summary> アイテムポーチのオブジェクト </summary>
+    [SerializeField] GameObject _itemPoach;
+    /// <summary> 懐中電灯のホルダーオブジェクト </summary>
+    [SerializeField] GameObject _flashLightHolder;
 
     //以下プレイヤー操作に必要なクラス
     PlayerMover _playerMover;
@@ -173,6 +183,42 @@ public class PlayerController : MonoBehaviour
     {
         _illuminate = context.ReadValueAsButton();//マウスボタン左のクリックの状態の格納
         //print($"{_illuminate} : is Illuminate");//デバッグ用
+    }
+
+    public void OnPick(InputAction.CallbackContext context)
+    {
+        _pickkedNow = context.ReadValueAsButton();//キーボードEの入力値を格納
+        //Debug.Log("pikkedNOW" + _pickkedNow);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        TriggeredObjectCheckToPickUp(other.gameObject);
+    }
+
+    public bool TriggeredObjectCheckToPickUp(GameObject triggeredObject)
+    {
+        List<string> _objectTagList = new List<string>() { "FlashLight", "Battery", "Empty" };
+        bool returnValue = !false;
+        if (triggeredObject != null)
+        {
+            string objectTag = triggeredObject.tag;
+            foreach (string tag in _objectTagList)
+            {
+                Debug.Log("TriggeredObjectSearchingTAG : " + tag);
+                if (objectTag == tag)
+                {
+                    returnValue = true;
+                    break;
+                }
+                else
+                {
+                    returnValue = false;
+                }
+            }
+        }
+        Debug.Log("TriggeredObjectRETURN : " + returnValue);
+        return returnValue;
     }
 }
 

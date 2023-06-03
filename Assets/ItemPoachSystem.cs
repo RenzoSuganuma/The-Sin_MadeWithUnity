@@ -18,7 +18,7 @@ public class ItemPoachSystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //_gameObject_DEBUGGING = _objectsManager.GetChildObjects(this.gameObject);
+        _gameObject_DEBUGGING = _objectsManager.GetChildObjects(this.gameObject);
         //_objectsManager.MakeChildToParent(_gameObject_DEBUGGING);
     }
 }
@@ -46,17 +46,18 @@ public class ChildObjectsManager
         // 子オブジェクトを順番に配列に格納
         foreach (Transform child in parentObject.transform)
         {
-            if(child != null)
+            if (child != null)
                 _children[childIndex++] = child;
             //Debug.Log("child index" + childIndex);
         }
         //子オブジェクトを順番にトランスフォーム型からゲームオブジェクト型に変換、返り値に格納
-        foreach(Transform child in _children)
+        foreach (Transform child in _children)
         {
-            if(child != null)
+            if (child != null)
                 _returnObjects[convertingIndex++] = child.gameObject;
             //Debug.Log("conv index" + convertingIndex);
         }
+
         return _returnObjects;
     }
 
