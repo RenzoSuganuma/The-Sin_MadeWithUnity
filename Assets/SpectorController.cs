@@ -18,6 +18,8 @@ public class SpectorController : MonoBehaviour
     /// <summary> 敵オブジェクト操作用のCapsuleCollider </summary>
     CapsuleCollider _capsuleCollider;
 
+    [SerializeField] private bool _isMadNow = true;
+
     private void Start()
     {
         _rb = GetComponent<Rigidbody>();//Rigidbodyの取得
@@ -31,6 +33,10 @@ public class SpectorController : MonoBehaviour
     private void FixedUpdate()
     {
         this.gameObject.transform.LookAt(_playerGameObject.transform.position, _playerGameObject.transform.up);//プレイヤーオブジェクトを向く
-        _rb.velocity = this.transform.forward * .5f;//正面に移動
+        if(_isMadNow)
+            _rb.AddForce(this.transform.forward * .3f, ForceMode.VelocityChange);//正面に移動
+        else
+            _rb.velocity = this.transform.forward * .5f;//正面に移動
+        //Debug.Log(_isMadNow);
     }
 }
