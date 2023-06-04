@@ -9,17 +9,16 @@ using System.Collections.Generic;
 /// <summary>
 /// プレイヤー操作用のクラス ver - alpha
 /// </summary>
-/// 
 public class PlayerController : MonoBehaviour
 {
     /// <summary> InputSystem の PlayerInputコンポーネント </summary>
     PlayerInput _playerInput;
 
     /// <summary> キャラ移動に使う </summary>
-    Rigidbody _rigidbody;
+    Rigidbody _rigidbody = default;
 
     /// <summary> キャラ移動に使うコライダー </summary>
-    CapsuleCollider _capsuleCollider;
+    CapsuleCollider _capsuleCollider = default;
 
     /// <summary> 移動ベクトル入力値の代入先 </summary>
     Vector2 _moveVector = Vector2.zero;
@@ -44,10 +43,22 @@ public class PlayerController : MonoBehaviour
     GameObject _playerCamera;
 
     /// <summary> 懐中電灯をつけてるか判定フラグ : 敵オブジェクトの有効無効判断用 読み込み専用 </summary>
-    public bool _flashLightIsOn = true;
+    private bool _flashLightIsOn = true;
 
     /// <summary> プレイヤーがアイテムを拾った時 </summary>
-    public bool _pickkingNow = false;
+    private bool _pickkingNow = false;
+
+    /// <summary> プレイヤーがリロードキーを押したとき </summary>
+    private bool _reloadNow = false;
+
+    /// <summary> 次に使うバッテリー </summary>
+    [SerializeField] private GameObject _currentBattery = null;
+    
+    /// <summary> 今使うバッテリー </summary>
+    [SerializeField] private GameObject _nextBattery = null;
+    
+    /// <summary> 次に使うバッテリー </summary>
+    [SerializeField] private GameObject[] _batteriesInInventry = null;
 
     /// <summary> SE用のオブジェクトのタグが紐づけされてるオブジェクト格納用 </summary>
     GameObject[] _compareTagSoundEffect;
@@ -57,18 +68,37 @@ public class PlayerController : MonoBehaviour
     /// <summary> アイテムポーチのオブジェクト </summary>
     [SerializeField] GameObject _itemPoach;
     /// <summary> 懐中電灯のホルダーオブジェクト </summary>
-    [SerializeField] GameObject _flashLightHolder;
+    [SerializeField] GameObject _playerHolder;
 
-    //以下プレイヤー操作に必要なクラス
-    PlayerMover _playerMover;
-    PlayerLooker _playerLooker;
-    MouseCursoreLocker _cursoreLocker;
-    FlashLightController _flashLightController;
-    PlayerCameraController _playerCameraController;
-    WalkingSoundEffectController _walkingSoundEffectController;
+    //以下プレイヤーの操作に必要なクラス
+    PlayerMover _playerMover;//プレイヤーの移動用クラス
+    PlayerLooker _playerLooker;//Player振り向き用クラス
+    MouseCursoreLocker _cursoreLocker;//カーソルロッククラス
+    FlashLightController _flashLightController;//懐中電灯操作用クラス
+    PlayerCameraController _playerCameraController;//Playerカメラの操作用クラス
+    WalkingSoundEffectController _walkingSoundEffectController;//歩行SE操作用クラス
+
+    /// <summary> アイテムポーチに必要な昨日を盛り込んでいるクラス </summary>
+    InventrySystem _inventrySystem;
 
     private void Start()
     {
+        //各必要なクラスのインスタンス化（以下）
+        _itemPoach = GameObject.FindGameObjectWithTag("Inventry_Poach");//インベントリーのオブジェクトの検索
+        _playerHolder = GameObject.FindGameObjectWithTag("Player_Holder");//フラッシュライトのオブジェクトの検索
+
+        _cursoreLocker = new MouseCursoreLocker();//マウスカーソルのロック用クラス使用
+        _cursoreLocker.MouseCursoreLock();//マウスカーソルのロック
+
+        _flashLightController = new FlashLightController();//懐中電灯の操作クラス
+        _playerMover = new PlayerMover();//プレイヤーの操作クラス
+        _playerLooker = new PlayerLooker();//プレイヤーの振り向きの操作クラス
+        _playerCameraController = new PlayerCameraController();//プレイヤーの視野操作クラス
+        _walkingSoundEffectController = new WalkingSoundEffectController();//プレイヤー歩行SEの操作クラス
+        //インベントリシステムクラス
+        _inventrySystem = new InventrySystem();
+
+
         if (TryGetComponent<PlayerInput>(out PlayerInput player))//PlayerInputコンポーネントがあるかチェック、あるならゲットする
         {
             _playerInput = player;//入手したコンポーネントの送信
@@ -101,8 +131,8 @@ public class PlayerController : MonoBehaviour
         else
             Debug.LogError("The Component CapsuleCollider Is Not Found");
 
-
-        { _flashLight = GameObject.FindGameObjectWithTag("FlashLight"); }//懐中電灯のオブジェクトの検索//ここの参照の仕方をインベントリポーチからの検索、参照にすること。参照が終わればこんどはflashLightHolderにアタッチしてあげること
+        //懐中電灯のオブジェクトの検索
+        { _flashLight = this._inventrySystem.GetRandomChildObjectWithTag(_playerHolder, "FlashLight"); }
         if (_flashLight.TryGetComponent<Light>(out Light light))//Lightコンポーネントの検索
             _light = light;
         else
@@ -110,7 +140,6 @@ public class PlayerController : MonoBehaviour
 
 
         { _playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera"); }
-
 
         _compareTagSoundEffect = GameObject.FindGameObjectsWithTag("SoundEffect");//効果音用のタグがアタッチされているオブジェクト（配列）を検索
         foreach (GameObject @object in _compareTagSoundEffect)//ボトムからトップまでの要素のチェック
@@ -121,18 +150,6 @@ public class PlayerController : MonoBehaviour
                 break; // 条件を満たすオブジェクトが見つかったらループを終了
             }
         }
-
-        _itemPoach = GameObject.FindGameObjectWithTag("Inventry_Poach");//インベントリーのオブジェクトの検索
-        _flashLightHolder = GameObject.FindGameObjectWithTag("FlashLight_Holder");//フラッシュライトのオブジェクトの検索
-
-        _cursoreLocker = new MouseCursoreLocker();//マウスカーソルのロック用クラス使用
-        _cursoreLocker.MouseCursoreLock();//マウスカーソルのロック
-
-        _flashLightController = new FlashLightController();
-        _playerMover = new PlayerMover();
-        _playerLooker = new PlayerLooker();
-        _playerCameraController = new PlayerCameraController();
-        _walkingSoundEffectController = new WalkingSoundEffectController();
     }
 
     private void Update()
@@ -149,6 +166,22 @@ public class PlayerController : MonoBehaviour
         _flashLightController.FlushLightLight(this._light, this._illuminate);//懐中電灯のONOFF
         _playerCameraController.PlayerCameraMove(this._playerCamera, this._lookVector, this._lookSpeed, 45f);//カメラ上下回転
         _walkingSoundEffectController.WalkingSoundEffectPlayStatusSet(this._walkingSoundEffectObject, this._moveVector);//歩行効果音操作
+
+        if(this._nextBattery == null)
+        {
+            this._batteriesInInventry = this._inventrySystem.GetChildObjectsWithTag(this._itemPoach, "Battery");
+            if (this._batteriesInInventry != null)
+            {
+                this._nextBattery = this._batteriesInInventry[0];
+            }
+        }
+
+        if (this._reloadNow)
+        {
+            _flashLightController.FlashLightBatteryCharge(100f);
+            Destroy(this._nextBattery);
+            this._nextBattery = null;
+        }
     }
 
     /// <summary>
@@ -159,7 +192,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.ReadValue<Vector2>() != null)
         {
-            _moveVector = context.ReadValue<Vector2>().normalized;//ベクトルの正規化をして単位ベクトルに変換かけて斜め移動の不自然さを解消
+            this._moveVector = context.ReadValue<Vector2>().normalized;//ベクトルの正規化をして単位ベクトルに変換かけて斜め移動の不自然さを解消
             //print($"{_moveVector} : InputDevice - InputValue");//デバッグ用
         }
     }
@@ -172,7 +205,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.ReadValue<Vector2>() != null)
         {
-            _lookVector= context.ReadValue<Vector2>().normalized;//ベクトルの正規化をして単位ベクトルに変換かけて斜めふり向きの不自然さを解消
+            this._lookVector = context.ReadValue<Vector2>().normalized;//ベクトルの正規化をして単位ベクトルに変換かけて斜めふり向きの不自然さを解消
             //print($"{_lookVector} : InputDevice - InputValue : Look");//デバッグ用
         }
     }
@@ -183,13 +216,27 @@ public class PlayerController : MonoBehaviour
     /// <param name="context"></param>
     public void OnFire(InputAction.CallbackContext context)
     {
-        _illuminate = context.ReadValueAsButton();//マウスボタン左のクリックの状態の格納
+        this._illuminate = context.ReadValueAsButton();//マウスボタン左のクリックの状態の格納
         //print($"{_illuminate} : is Illuminate");//デバッグ用
     }
 
-    public void OnPick(InputAction.CallbackContext context)
+    /// <summary>
+    /// インタラクトの入力があったとき
+    /// </summary>
+    /// <param name="context"></param>
+    public void OnInteract(InputAction.CallbackContext context)
     {
-        _pickkingNow = context.ReadValueAsButton();//キーボードEの入力値を格納
+        this._pickkingNow = context.ReadValueAsButton();//キーボードEの入力値を格納
+        //Debug.Log("pikkedNOW" + _pickkingNow);
+    }
+    
+    /// <summary>
+    /// リロードの入力があったとき
+    /// </summary>
+    /// <param name="context"></param>
+    public void OnReload(InputAction.CallbackContext context)
+    {
+        this._reloadNow = context.ReadValueAsButton();//キーボードEの入力値を格納
         //Debug.Log("pikkedNOW" + _pickkingNow);
     }
 
@@ -200,8 +247,17 @@ public class PlayerController : MonoBehaviour
             Debug.Log($"{other.name} Is Can Pick");
             if (this._pickkingNow)
             {
-                AttachToItemPoach(other.gameObject, this._itemPoach);
-                _flashLightController.FlashLightBatteryCharge(100f);
+                if (other.gameObject.CompareTag("Battery"))
+                { 
+                    if (this._nextBattery != null)
+                    {
+                        AttachItemToPoach(other.gameObject, this._itemPoach);
+                    }
+                    else
+                    {
+                        this._nextBattery = other.gameObject;
+                    }
+                }
                 Debug.Log($"Picked {other.name}");
             }
         }
@@ -242,11 +298,9 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     /// <param name="itemObject"></param>
     /// <param name="itemPoachObject"></param>
-    private void AttachToItemPoach(GameObject itemObject,GameObject itemPoachObject)
+    private void AttachItemToPoach(GameObject itemObject,GameObject itemPoachObject)
     {
-        itemObject.transform.parent = itemPoachObject.transform;
-        itemPoachObject.transform.localPosition = Vector3.zero;//TransformをVector3.zeroにする
-        itemObject.SetActive(false);//非アクティブにして格納。プレイ途中で見えなくしたいため
+        _inventrySystem.MakeParenToChild(itemObject, itemPoachObject.transform);
     }
 }
 
@@ -319,6 +373,11 @@ public class FlashLightController
         _batteryLife = batteryPower;//バッテリーの寿命の回復をする
         Debug.Log($"battery charged");
     }
+
+    public float GetBatteryLife()
+    {
+        return _batteryLife;
+    }
 }
 
 /// <summary>
@@ -365,45 +424,5 @@ public class WalkingSoundEffectController
         {
             gameObject.SetActive(false);
         }
-    }
-}
-
-/// <summary>
-/// タイマーのクラス
-/// </summary>
-public class Timer
-{
-    public float targetTime = 10.0f; // 目標時間（秒）
-    private float currentTime = 0.0f; // 現在の経過時間
-
-    private bool isTimerRunning = false; // タイマーが動作中かどうか
-    public bool isTimerPaused = false;
-
-    public void UpdateTimer()
-    {
-        if (isTimerRunning)
-        {
-            currentTime += Time.deltaTime; // 経過時間を更新
-            Debug.Log($"CurrentTime : {currentTime}");
-            if (currentTime >= targetTime)
-            {
-                // 目標時間を経過したら、メッセージを表示
-                Debug.Log("Time's up!");
-
-                // タイマーを停止する（任意の処理を行う場合はここに追加）
-                isTimerRunning = false;
-                isTimerPaused = !isTimerRunning;//公開変数の値設定
-            }
-        }
-    }
-
-    public void StartTimer()
-    {
-        // タイマーを開始する（任意の処理を行う場合はここに追加）
-        isTimerRunning = true;
-        isTimerPaused = !isTimerRunning;//公開変数の値設定
-
-        // 経過時間をリセット
-        currentTime = 0.0f;
     }
 }

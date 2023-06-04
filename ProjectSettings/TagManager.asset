@@ -10,7 +10,7 @@ TagManager:
   - Spector_Enemy
   - Battery
   - Inventry_Poach
-  - FlashLight_Holder
+  - Player_Holder
   layers:
   - Default
   - TransparentFX
