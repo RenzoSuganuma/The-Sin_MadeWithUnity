@@ -79,6 +79,9 @@ public class PlayerController : MonoBehaviour
     /// <summary> 電池寿命を格納しているコンポーネント </summary>
     BatteryLifeContainor _batteryLifeContainor;
 
+    /// <summary> 遺言が格納されているオブジェクトの遺言を見るため使用 </summary>
+    DiyingWillTextContainer _diyingWillTextContainer;
+
     private void Start()
     {
         //各必要なクラスのインスタンス化（以下）
@@ -235,6 +238,12 @@ public class PlayerController : MonoBehaviour
             Debug.Log($"{other.name} Is Can Pick");
             if (this._pickkingNow)
             {
+                //日記だった場合
+                if (other.gameObject.CompareTag("Diary"))
+                {
+                    this._diyingWillTextContainer = other.gameObject.GetComponent<DiyingWillTextContainer>();
+                    //Debug.Log($"DEBUG-LOG:DIYING-WILL:TEST-OUTPUT{this._diyingWillTextContainer._text}");SUCCED
+                }
                 AttachItemToPoach(other.gameObject, this._itemPoach);
                 Debug.Log($"Picked {other.name}");
             }

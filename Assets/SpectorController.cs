@@ -13,7 +13,11 @@ public class SpectorController : MonoBehaviour
     /// <summary> プレイヤーオブジェクト </summary>
     GameObject _playerGameObject = null;
 
+    /// <summary> 亡霊が怒り常態か </summary>
     [SerializeField] private bool _isMadNow = true;
+
+    /// <summary> 亡霊消滅時のVFX </summary>
+    [SerializeField] private GameObject _deathEffect = null;
 
     private void Start()
     {
@@ -35,10 +39,16 @@ public class SpectorController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player"))//Playerとぶつかったら
         {
             Debug.Log("Collided WITH Player");
-            Destroy(this.gameObject);
+            if (this._deathEffect != null)//VFXがスクリプトにアタッチされてたら
+            {
+                //this._deathEffect.SetActive(true);
+                GameObject effect = Instantiate(this._deathEffect);//生成
+                effect.transform.position = this.gameObject.transform.position;//ぶつかった位置にポジションを修正
+            }
+            Destroy(this.gameObject);//このオブジェクトの破棄
         }
     }
 }

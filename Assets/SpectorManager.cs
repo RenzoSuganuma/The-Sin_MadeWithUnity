@@ -17,14 +17,14 @@ public class SpectorManager : MonoBehaviour
 
     private void Start()
     {
-        _playerFlashLight = GameObject.FindGameObjectWithTag("FlashLight");
-        _enemyObject = GameObject.FindGameObjectsWithTag("Spector_Enemy");//Spector＿Enemyのタグの紐づけされている敵すべて検索
+        this._playerFlashLight = GameObject.FindGameObjectWithTag("FlashLight");
+        this._enemyObject = GameObject.FindGameObjectsWithTag("Spector_Enemy");//Spector＿Enemyのタグの紐づけされている敵すべて検索
     }
 
     // Update is called once per frame
     private void Update()
     {
-        _playerIsLighting = _playerFlashLight.GetComponent<Light>().enabled;//プレイヤー操作用のクラスからの懐中電灯のLightコンポーネントのOnOFFを監視、コンディションの取得
+        this._playerIsLighting = this._playerFlashLight.GetComponent<Light>().enabled;//プレイヤー操作用のクラスからの懐中電灯のLightコンポーネントのOnOFFを監視、コンディションの取得
         if (_playerIsLighting)//懐中電灯をつけているうちにはこのオブジェクトは無効
         {
             if (_enemyObject != null)//nullチェック
@@ -47,7 +47,6 @@ public class SpectorManager : MonoBehaviour
                 }
             }
         } 
-
         //print($"{_playerIsLighting} : is player lighting status");
     }
 }
