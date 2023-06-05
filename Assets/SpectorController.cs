@@ -5,8 +5,6 @@ using System.Collections.Generic;
 /// 敵キャラ操作用クラス ver - alpha
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(CapsuleCollider))]
-
 public class SpectorController : MonoBehaviour
 {
     /// <summary> 敵オブジェクト操作用のRigidbody </summary>
@@ -15,28 +13,23 @@ public class SpectorController : MonoBehaviour
     /// <summary> プレイヤーオブジェクト </summary>
     GameObject _playerGameObject = null;
 
-    /// <summary> 敵オブジェクト操作用のCapsuleCollider </summary>
-    CapsuleCollider _capsuleCollider;
-
     [SerializeField] private bool _isMadNow = true;
 
     private void Start()
     {
-        _rb = GetComponent<Rigidbody>();//Rigidbodyの取得
-        _capsuleCollider = GetComponent<CapsuleCollider>();//CapsuleColliderの取得
-        _playerGameObject = GameObject.FindGameObjectWithTag("Player");//プレイヤーオブジェクトの検索
+        this._rb = GetComponent<Rigidbody>();//Rigidbodyの取得
+        this._playerGameObject = GameObject.FindGameObjectWithTag("PlayerCamera");//プレイヤーオブジェクトの検索
 
-        { _rb.useGravity = false; }//Rigidbody初期化
-        { _capsuleCollider.isTrigger = true; }//CapsuleCollider初期化
+        { this._rb.useGravity = false; }//Rigidbody初期化
     }
 
     private void FixedUpdate()
     {
-        this.gameObject.transform.LookAt(_playerGameObject.transform.position, _playerGameObject.transform.up);//プレイヤーオブジェクトを向く
-        if(_isMadNow)
-            _rb.AddForce(this.transform.forward * .3f, ForceMode.VelocityChange);//正面に移動
+        this.gameObject.transform.LookAt(this._playerGameObject.transform.position, this._playerGameObject.transform.up);//プレイヤーオブジェクトを向く
+        if(this._isMadNow)
+            this._rb.AddForce(this.transform.forward * .3f, ForceMode.VelocityChange);//正面に移動
         else
-            _rb.velocity = this.transform.forward * .5f;//正面に移動
+            this._rb.velocity = this.transform.forward * .6f;//正面に移動
         //Debug.Log(_isMadNow);
     }
 

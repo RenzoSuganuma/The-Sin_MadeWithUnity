@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
 
     /// <summary> これが真の値の時には懐中電灯はついているようにする </summary>
     private bool _illuminate = !true;
+
     /// <summary> Lightコンポーネント　ここではプレイヤーの懐中電灯のコンポーネント </summary>
     Light _light;
     /// <summary> プレイヤーの懐中電灯のオブジェクト </summary>
@@ -160,10 +161,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        //TEST
-        SetUsingBattery();
-        //#endTEST
-
+        SetUsingBattery();//使用するバッテリーを選択
+        
         { this._flashLightIsOn = this._illuminate; }//ほかクラスから懐中電灯のステータスをスコープするため
 
         this._playerMover.PlayerMove(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
@@ -249,7 +248,7 @@ public class PlayerController : MonoBehaviour
     /// <returns></returns>
     private bool TriggeredObjectCheckToPickUp(GameObject triggeredObject)
     {
-        List<string> _objectTagList = new List<string>() { "FlashLight", "Battery", "Empty" };//拾えるアイテムのタグのリスト
+        List<string> _objectTagList = new List<string>() { "FlashLight", "Battery", "Diary" };//拾えるアイテムのタグのリスト
         bool returnValue = true;
         if (triggeredObject != null)//ひとまずnullチェック
         {

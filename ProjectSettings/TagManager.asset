@@ -11,6 +11,7 @@ TagManager:
   - Battery
   - Inventry_Poach
   - Player_Hand
+  - Diary
   layers:
   - Default
   - TransparentFX
