@@ -51,15 +51,6 @@ public class PlayerController : MonoBehaviour
     /// <summary> プレイヤーがリロードキーを押したとき </summary>
     private bool _reloadNow = false;
 
-    /// <summary> 次に使うバッテリー </summary>
-    [SerializeField] private GameObject _currentBattery = null;
-    
-    /// <summary> 今使うバッテリー </summary>
-    [SerializeField] private GameObject _nextBattery = null;
-    
-    /// <summary> 次に使うバッテリー </summary>
-    [SerializeField] private GameObject[] _batteriesInInventry = null;
-
     /// <summary> SE用のオブジェクトのタグが紐づけされてるオブジェクト格納用 </summary>
     GameObject[] _compareTagSoundEffect;
     /// <summary> プレイヤー歩行時の効果音再生用のオブジェクト格納用 </summary>
@@ -67,8 +58,11 @@ public class PlayerController : MonoBehaviour
 
     /// <summary> アイテムポーチのオブジェクト </summary>
     [SerializeField] GameObject _itemPoach;
-    /// <summary> 懐中電灯のホルダーオブジェクト </summary>
-    [SerializeField] GameObject _playerHolder;
+    /// <summary> 使用中のアイテムのホルダーオブジェクト </summary>
+    [SerializeField] GameObject _playerHand;
+
+    /// <summary> 使用中の電池オブジェクト </summary>
+    [SerializeField] GameObject _usingBatteryNow;
 
     //以下プレイヤーの操作に必要なクラス
     PlayerMover _playerMover;//プレイヤーの移動用クラス
@@ -78,45 +72,45 @@ public class PlayerController : MonoBehaviour
     PlayerCameraController _playerCameraController;//Playerカメラの操作用クラス
     WalkingSoundEffectController _walkingSoundEffectController;//歩行SE操作用クラス
 
-    /// <summary> アイテムポーチに必要な昨日を盛り込んでいるクラス </summary>
+    /// <summary> アイテムポーチに必要な機能を盛り込んでいるコンポーネント </summary>
     InventrySystem _inventrySystem;
+
+    /// <summary> 電池寿命を格納しているコンポーネント </summary>
+    BatteryLifeContainor _batteryLifeContainor;
 
     private void Start()
     {
         //各必要なクラスのインスタンス化（以下）
-        _itemPoach = GameObject.FindGameObjectWithTag("Inventry_Poach");//インベントリーのオブジェクトの検索
-        _playerHolder = GameObject.FindGameObjectWithTag("Player_Holder");//フラッシュライトのオブジェクトの検索
+        this._itemPoach = GameObject.FindGameObjectWithTag("Inventry_Poach");//インベントリーのオブジェクトの検索
+        this._playerHand = GameObject.FindGameObjectWithTag("Player_Hand");//フラッシュライトのオブジェクトの検索
 
-        _cursoreLocker = new MouseCursoreLocker();//マウスカーソルのロック用クラス使用
-        _cursoreLocker.MouseCursoreLock();//マウスカーソルのロック
+        this._cursoreLocker = new MouseCursoreLocker();//マウスカーソルのロック用クラス使用
+        this._cursoreLocker.MouseCursoreLock();//マウスカーソルのロック
 
-        _flashLightController = new FlashLightController();//懐中電灯の操作クラス
-        _playerMover = new PlayerMover();//プレイヤーの操作クラス
-        _playerLooker = new PlayerLooker();//プレイヤーの振り向きの操作クラス
-        _playerCameraController = new PlayerCameraController();//プレイヤーの視野操作クラス
-        _walkingSoundEffectController = new WalkingSoundEffectController();//プレイヤー歩行SEの操作クラス
-        //インベントリシステムクラス
-        _inventrySystem = new InventrySystem();
-
+        this._flashLightController = new FlashLightController();//懐中電灯の操作クラス
+        this._playerMover = new PlayerMover();//プレイヤーの操作クラス
+        this._playerLooker = new PlayerLooker();//プレイヤーの振り向きの操作クラス
+        this._playerCameraController = new PlayerCameraController();//プレイヤーの視野操作クラス
+        this._walkingSoundEffectController = new WalkingSoundEffectController();//プレイヤー歩行SEの操作クラス
 
         if (TryGetComponent<PlayerInput>(out PlayerInput player))//PlayerInputコンポーネントがあるかチェック、あるならゲットする
         {
-            _playerInput = player;//入手したコンポーネントの送信
-            _playerInput.defaultActionMap = "Player";//DefaultMapの初期化
+            this._playerInput = player;//入手したコンポーネントの送信
+            this._playerInput.defaultActionMap = "Player";//DefaultMapの初期化
         }
         else
             Debug.LogError("The Component PlayerInput Is Not Found");
 
         if (TryGetComponent<Rigidbody>(out Rigidbody rigid))//Digidbodyコンポーネントがあるかチェック、あるならゲットする
         {
-            _rigidbody = rigid;//入手したコンポーネントの送信
+            this._rigidbody = rigid;//入手したコンポーネントの送信
             //各パラメーターの初期化
-            _rigidbody.mass = 1.0f;
-            _rigidbody.drag = 1.5f;
-            _rigidbody.angularDrag = .05f;
-            _rigidbody.useGravity = true;
-            _rigidbody.isKinematic = !true;
-            _rigidbody.freezeRotation = true;
+            this._rigidbody.mass = 1.0f;
+            this._rigidbody.drag = 1.5f;
+            this._rigidbody.angularDrag = .05f;
+            this._rigidbody.useGravity = true;
+            this._rigidbody.isKinematic = false;
+            this._rigidbody.freezeRotation = true;
         }
         else
             Debug.LogError("The Component Rigidbody Is Not Found");
@@ -124,33 +118,40 @@ public class PlayerController : MonoBehaviour
         if (TryGetComponent<CapsuleCollider>(out CapsuleCollider capsule))//Digidbodyコンポーネントがあるかチェック、あるならゲットする
         {
             //各パラメーターの初期化
-            _capsuleCollider = capsule;
-            _capsuleCollider.radius = .3f;
-            _capsuleCollider.height = 1.5f;
+            this._capsuleCollider = capsule;
+            this._capsuleCollider.radius = .3f;
+            this._capsuleCollider.height = 1.5f;
         }
         else
             Debug.LogError("The Component CapsuleCollider Is Not Found");
 
+        if(TryGetComponent<InventrySystem>(out InventrySystem inventrySystem))//インベントリシステムのコンポーネントの取得
+        {
+            this._inventrySystem = inventrySystem;
+        }
+        else
+            Debug.LogError("The Component InventrySystem Is Not Found");
+
         //懐中電灯のオブジェクトの検索
-        { _flashLight = this._inventrySystem.GetRandomChildObjectWithTag(_playerHolder, "FlashLight"); }
+        { this._flashLight = this._inventrySystem.GetRandomChildObjectWithTag(_playerHand, "FlashLight"); }
         if (_flashLight.TryGetComponent<Light>(out Light light))//Lightコンポーネントの検索
-            _light = light;
+            this._light = light;
         else
             Debug.LogError("The Component Light Is Not Found");
 
 
-        { _playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera"); }
+        { this._playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera"); }
 
-        _compareTagSoundEffect = GameObject.FindGameObjectsWithTag("SoundEffect");//効果音用のタグがアタッチされているオブジェクト（配列）を検索
-        foreach (GameObject @object in _compareTagSoundEffect)//ボトムからトップまでの要素のチェック
+        this._compareTagSoundEffect = GameObject.FindGameObjectsWithTag("SoundEffect");//効果音用のタグがアタッチされているオブジェクト（配列）を検索
+        foreach (GameObject @object in this._compareTagSoundEffect)//ボトムからトップまでの要素のチェック
         {
             if (@object.CompareTag("SoundEffect") && @object.name == "Walk_SE")//特定の条件を満たすオブジェクトを見つけた場合
             {
-                _walkingSoundEffectObject = @object; // 変数にオブジェクトを格納
+                this._walkingSoundEffectObject = @object; // 変数にオブジェクトを格納
                 break; // 条件を満たすオブジェクトが見つかったらループを終了
             }
         }
-    }
+       }
 
     private void Update()
     {
@@ -159,29 +160,17 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        { _flashLightIsOn = _illuminate; }//ほかクラスから懐中電灯のステータスをスコープするため
+        //TEST
+        SetUsingBattery();
+        //#endTEST
 
-        _playerMover.PlayerMove(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
-        _playerLooker.PlayerLooking(this.gameObject.transform, this._lookVector, this._lookSpeed);//振り向き
-        _flashLightController.FlushLightLight(this._light, this._illuminate);//懐中電灯のONOFF
-        _playerCameraController.PlayerCameraMove(this._playerCamera, this._lookVector, this._lookSpeed, 45f);//カメラ上下回転
-        _walkingSoundEffectController.WalkingSoundEffectPlayStatusSet(this._walkingSoundEffectObject, this._moveVector);//歩行効果音操作
+        { this._flashLightIsOn = this._illuminate; }//ほかクラスから懐中電灯のステータスをスコープするため
 
-        if(this._nextBattery == null)
-        {
-            this._batteriesInInventry = this._inventrySystem.GetChildObjectsWithTag(this._itemPoach, "Battery");
-            if (this._batteriesInInventry != null)
-            {
-                this._nextBattery = this._batteriesInInventry[0];
-            }
-        }
-
-        if (this._reloadNow)
-        {
-            _flashLightController.FlashLightBatteryCharge(100f);
-            Destroy(this._nextBattery);
-            this._nextBattery = null;
-        }
+        this._playerMover.PlayerMove(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
+        this._playerLooker.PlayerLooking(this.gameObject.transform, this._lookVector, this._lookSpeed);//振り向き
+        this._flashLightController.FlushLightLight(this._light, this._illuminate, this._usingBatteryNow);//懐中電灯のONOFF
+        this._playerCameraController.PlayerCameraMove(this._playerCamera, this._lookVector, this._lookSpeed, 45f);//カメラ上下回転
+        this._walkingSoundEffectController.WalkingSoundEffectPlayStatusSet(this._walkingSoundEffectObject, this._moveVector);//歩行効果音操
     }
 
     /// <summary>
@@ -247,17 +236,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log($"{other.name} Is Can Pick");
             if (this._pickkingNow)
             {
-                if (other.gameObject.CompareTag("Battery"))
-                { 
-                    if (this._nextBattery != null)
-                    {
-                        AttachItemToPoach(other.gameObject, this._itemPoach);
-                    }
-                    else
-                    {
-                        this._nextBattery = other.gameObject;
-                    }
-                }
+                AttachItemToPoach(other.gameObject, this._itemPoach);
                 Debug.Log($"Picked {other.name}");
             }
         }
@@ -300,7 +279,26 @@ public class PlayerController : MonoBehaviour
     /// <param name="itemPoachObject"></param>
     private void AttachItemToPoach(GameObject itemObject,GameObject itemPoachObject)
     {
-        _inventrySystem.MakeParenToChild(itemObject, itemPoachObject.transform);
+        this._inventrySystem.MakeParenToChild(itemObject, itemPoachObject.transform);
+    }
+
+    /// <summary>
+    /// バッテリの使用ORNOT制御関数
+    /// </summary>
+    private void SetUsingBattery()
+    {
+        //現在使用中のバッテリーがなく、インベントリにあるか検索
+        if (this._usingBatteryNow == null)//現在使っているバッテリーが空になった場合にこの処理を呼び出す
+        {
+            if (this._inventrySystem.GetRandomChildObjectWithTag(this._itemPoach, "Battery") != null)//インベントリ内の該当オブジェクトがあった場合
+                this._usingBatteryNow = this._inventrySystem.GetRandomChildObjectWithTag(this._itemPoach, "Battery");
+
+            if (this._usingBatteryNow != null && this._usingBatteryNow.GetComponent<BatteryLifeContainor>() != null)//ダブルのオブジェクトとコンポーネントのnull-check
+            {
+                this._batteryLifeContainor = this._usingBatteryNow.GetComponent<BatteryLifeContainor>();
+                this._flashLightController.SetBatteryLife(this._batteryLifeContainor._batteryLife);//現在使っているバッテリーの寿命値を設定
+            }
+        }
     }
 }
 
@@ -351,32 +349,41 @@ public class MouseCursoreLocker
 /// </summary>
 public class FlashLightController
 {
-    private static float _batteryLife = 10f;//バッテリーの寿命の初期値
-    public void FlushLightLight(Light light, bool lightOrnot)
+    private float _batteryLife = 0f;//バッテリーの寿命の初期値
+    public void FlushLightLight(Light light, bool lightOrnot, GameObject currentBatteryObject)
     {
         if (_batteryLife > 0)//バッテリー残量があるとき
         {
             light.enabled = lightOrnot;//点灯の入力値に応じてコンポーネントの有効無効を切り替え
-            _batteryLife -= Time.deltaTime;//通常消費
+            this._batteryLife -= Time.deltaTime;//通常消費
             if(lightOrnot) _batteryLife -= Time.deltaTime * 1.5f;//点灯をすれば消費量は増えるから点灯時余分に消費
             Debug.Log($"current battery life : {_batteryLife}");
         }
         else
         {
             light.enabled = false;//点灯できないようにする
+            if(currentBatteryObject != null)
+                GameObject.Destroy(currentBatteryObject);
             Debug.Log($"current battery is death");
         }
     }
 
+    /*
     public void FlashLightBatteryCharge(float batteryPower)
     {
-        _batteryLife = batteryPower;//バッテリーの寿命の回復をする
+        this._batteryLife = batteryPower;//バッテリーの寿命の回復をする
         Debug.Log($"battery charged");
     }
+    */
 
     public float GetBatteryLife()
     {
         return _batteryLife;
+    }
+    
+    public void SetBatteryLife(float batteryLifeValue)
+    {
+        this._batteryLife = batteryLifeValue;
     }
 }
 

@@ -112,7 +112,7 @@ public class InventrySystem : MonoBehaviour
     }
 
     /// <summary>
-    /// 子オブジェクトをタグで検索をかけて見つかったアクティブになってるオブジェクトをすべて返すactiveStatus == trueでactiveSelfの値がtrueのオブジェクトを探す 配列のindex=0の実体を返す
+    /// 子オブジェクトをタグで検索をかけて見つかったオブジェクト配列のindex=0の実体を返す
     /// </summary>
     /// <param name="parentObject"></param>
     /// <param name="objectTag"></param>
@@ -140,14 +140,19 @@ public class InventrySystem : MonoBehaviour
         //タグの紐づけの検索
         foreach (GameObject obj in _childObjects)
         {
-            if (obj.gameObject.CompareTag(objectTag) && obj.activeSelf)
+            if (obj.gameObject.CompareTag(objectTag))
             {
                 _returnObjects[arrayIndex++] = obj;
                 foundObjectCount++;
             }
         }
-        Array.Resize(ref _returnObjects, foundObjectCount);
-        return _returnObjects[0];
+        Debug.Log("Found Object Is" + foundObjectCount);
+        if(foundObjectCount > 0)//配列のサイズを最低でも1確保する
+        {
+            Array.Resize(ref _returnObjects, foundObjectCount);
+            return _returnObjects[0];//nullが返るときもあるヨ
+        }
+        return null;
     }
 
     /// <summary>
