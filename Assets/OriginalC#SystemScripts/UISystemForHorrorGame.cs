@@ -18,6 +18,9 @@ public class UISystemForHorrorGame : MonoBehaviour
 
     /// <summary> 拾ったアイテム名表示のクラス </summary>
     public ItemPickedTextController _itemPickedTextController;
+    
+    /// <summary> 目標表示のクラス </summary>
+    public ObjectiveTextController _objectiveTextController;
 
     private void Start()
     {
@@ -28,6 +31,7 @@ public class UISystemForHorrorGame : MonoBehaviour
             this._hpProgBarController = new HPProgressBarController(_document.rootVisualElement);
             this._itemTextController = new ItemTextController(_document.rootVisualElement);
             this._itemPickedTextController = new ItemPickedTextController(_document.rootVisualElement);
+            this._objectiveTextController = new ObjectiveTextController(_document.rootVisualElement);
         }
     }
 
@@ -91,6 +95,22 @@ public class ItemPickedTextController
     public ItemPickedTextController(VisualElement root)
     {
         this._label = root.Q<UnityEngine.UIElements.Label>("ItemPickedText");//()内の文字列はNameでバインドされている文字列
+        //値の初期化
+        this._label.text = string.Empty;
+    }
+
+    public void OutPutTextToDisplay(string title)
+    {
+        this._label.text = title;
+    }
+}
+
+public class ObjectiveTextController
+{
+    private UnityEngine.UIElements.Label _label;
+    public ObjectiveTextController(VisualElement root)
+    {
+        this._label = root.Q<UnityEngine.UIElements.Label>("ObjectiveText");//()内の文字列はNameでバインドされている文字列
         //値の初期化
         this._label.text = string.Empty;
     }

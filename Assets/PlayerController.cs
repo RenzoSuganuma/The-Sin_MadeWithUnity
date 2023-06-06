@@ -85,6 +85,7 @@ public class PlayerController : MonoBehaviour
     /// <summary> UI表示に使用 </summary>
     UISystemForHorrorGame _uiSystemForHorrorGame;
 
+    /// <summary> UIのゲームオブジェクト </summary>
     [SerializeField] private GameObject _uiGameObject;
 
     private void Start()
@@ -141,7 +142,7 @@ public class PlayerController : MonoBehaviour
         else
             Debug.LogError("The Component InventrySystem Is Not Found");
 
-        if(this._uiGameObject != null)
+        if(this._uiGameObject != null)//UIのオブジェクトがアタッチされてるかチェック
         {
             if (this._uiGameObject.TryGetComponent<UISystemForHorrorGame>(out UISystemForHorrorGame uiSystemForHorrorGame))
             {
@@ -169,11 +170,14 @@ public class PlayerController : MonoBehaviour
                 break; // 条件を満たすオブジェクトが見つかったらループを終了
             }
         }
-       }
+
+        this._uiSystemForHorrorGame._objectiveTextController.OutPutTextToDisplay("サキヲメザセ(^ ^@)");
+    }
 
     private void Update()
     {
-        
+        this._uiSystemForHorrorGame._hpProgBarController.ModifyProgressValue(1f);
+        this._uiSystemForHorrorGame._hpProgBarController.ModifyTitle("体力だにょ～ん");
     }
 
     private void FixedUpdate()

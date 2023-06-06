@@ -47,6 +47,7 @@ public class SpectorController : MonoBehaviour
                 //this._deathEffect.SetActive(true);
                 GameObject effect = Instantiate(this._deathEffect);//生成
                 effect.transform.position = this.gameObject.transform.position;//ぶつかった位置にポジションを修正
+                effect.gameObject.name = effect.gameObject.name.Replace("(Clone)", "");//名前の(Clone)を削除する
             }
             Destroy(this.gameObject);//このオブジェクトの破棄
         }
