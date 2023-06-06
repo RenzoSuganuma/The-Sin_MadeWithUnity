@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// ˆâŒ¾‚ÌŠi”[ƒNƒ‰ƒX
+/// ˆâŒ¾‚ÌŠi”[ƒNƒ‰ƒX 2023/06/06
 /// </summary>
 public class DiyingWillTextContainer : MonoBehaviour
 {

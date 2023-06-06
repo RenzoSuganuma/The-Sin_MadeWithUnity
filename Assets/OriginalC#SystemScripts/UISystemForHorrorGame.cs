@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 /// <summary>
-/// Unity UIToolkit対応版のクラス
+/// Unity UIToolkit対応版のクラス 2023/06/06
 /// </summary>
 public class UISystemForHorrorGame : MonoBehaviour
 {

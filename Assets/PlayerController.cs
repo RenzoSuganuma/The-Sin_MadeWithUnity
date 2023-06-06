@@ -7,7 +7,7 @@ using System.Collections.Generic;
 [RequireComponent (typeof(PlayerInput))]
 [RequireComponent (typeof(CapsuleCollider))]
 /// <summary>
-/// プレイヤー操作用のクラス ver - alpha
+/// プレイヤー操作用のクラス ver - alpha 2023/06/06
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
@@ -63,7 +63,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject _playerHand;
 
     /// <summary> 使用中の電池オブジェクト </summary>
-    [SerializeField] GameObject _usingBatteryNow;
+    GameObject _usingBatteryNow;
 
     //以下プレイヤーの操作に必要なクラス
     PlayerMover _playerMover;//プレイヤーの移動用クラス
@@ -81,6 +81,11 @@ public class PlayerController : MonoBehaviour
 
     /// <summary> 遺言が格納されているオブジェクトの遺言を見るため使用 </summary>
     DiyingWillTextContainer _diyingWillTextContainer;
+
+    /// <summary> UI表示に使用 </summary>
+    UISystemForHorrorGame _uiSystemForHorrorGame;
+
+    [SerializeField] private GameObject _uiGameObject;
 
     private void Start()
     {
@@ -136,6 +141,16 @@ public class PlayerController : MonoBehaviour
         else
             Debug.LogError("The Component InventrySystem Is Not Found");
 
+        if(this._uiGameObject != null)
+        {
+            if (this._uiGameObject.TryGetComponent<UISystemForHorrorGame>(out UISystemForHorrorGame uiSystemForHorrorGame))
+            {
+                this._uiSystemForHorrorGame = uiSystemForHorrorGame;
+            }
+        }
+        else
+            Debug.LogError("The GameObject _uiGameObject Is Not Found");
+
         //懐中電灯のオブジェクトの検索
         { this._flashLight = this._inventrySystem.GetRandomChildObjectWithTag(_playerHand, "FlashLight"); }
         if (_flashLight.TryGetComponent<Light>(out Light light))//Lightコンポーネントの検索
@@ -143,8 +158,7 @@ public class PlayerController : MonoBehaviour
         else
             Debug.LogError("The Component Light Is Not Found");
 
-
-        { this._playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera"); }
+                { this._playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera"); }
 
         this._compareTagSoundEffect = GameObject.FindGameObjectsWithTag("SoundEffect");//効果音用のタグがアタッチされているオブジェクト（配列）を検索
         foreach (GameObject @object in this._compareTagSoundEffect)//ボトムからトップまでの要素のチェック
@@ -236,6 +250,7 @@ public class PlayerController : MonoBehaviour
         if (TriggeredObjectCheckToPickUp(other.gameObject))
         {
             Debug.Log($"{other.name} Is Can Pick");
+            this._uiSystemForHorrorGame._itemTextController.OutPutTextToDisplay($"{other.gameObject.name}を拾う");//拾えるアイテム名を表示
             if (this._pickkingNow)
             {
                 //日記だった場合
@@ -246,8 +261,15 @@ public class PlayerController : MonoBehaviour
                 }
                 AttachItemToPoach(other.gameObject, this._itemPoach);
                 Debug.Log($"Picked {other.name}");
+                this._uiSystemForHorrorGame._itemTextController.OutPutTextToDisplay($"");//拾えるアイテム名を表示していたものを非表示にする
+                this._uiSystemForHorrorGame._itemPickedTextController.OutPutTextToDisplay($"{other.gameObject.name}を拾った");//拾ったアイテム名を表示
             }
         }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        this._uiSystemForHorrorGame._itemTextController.OutPutTextToDisplay($"");//拾えるアイテム名を表示していたものを非表示にする
     }
 
     /// <summary>

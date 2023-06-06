@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System;
 using UnityEditor;
 /// <summary>
-/// インベントリシステム用のクラス ver - alpha
+/// インベントリシステム用のクラス ver - alpha 2023/06/06
 /// </summary>
 public class InventrySystem : MonoBehaviour
 {

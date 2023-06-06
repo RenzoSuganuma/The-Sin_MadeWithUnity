@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 /// <summary>
-/// 敵キャラ操作用クラス ver - alpha
+/// 敵キャラ操作用クラス ver - alpha 2023/06/06
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 public class SpectorController : MonoBehaviour
