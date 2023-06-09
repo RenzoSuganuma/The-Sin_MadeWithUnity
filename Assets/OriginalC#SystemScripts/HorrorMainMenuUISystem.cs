@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
@@ -71,6 +72,7 @@ public class HorrorMainMenuUISystem : MonoBehaviour
     private void QuitButtonClicked()//OSに戻るボタン
     {
         Debug.Log(_quitButton.text);
+        GoToOS();
     }
 
     private void BackToMainMenuClicked()//メインメニューに戻るボタン
@@ -126,5 +128,16 @@ public class HorrorMainMenuUISystem : MonoBehaviour
             this._sceneLoadingProgressBar.value = async.progress;
             yield return null;
         }
+    }
+
+    void GoToOS()
+    {
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;//ゲームプレイ終了
+        #endif
+
+        #if UNITY_STANDALONE_WIN
+            Application.Quit();//ゲームプレイ終了
+        #endif
     }
 }

@@ -88,6 +88,9 @@ public class PlayerController : MonoBehaviour
     /// <summary> UIのゲームオブジェクト </summary>
     [SerializeField] private GameObject _uiGameObject;
 
+    /// <summary> 一時停止するか </summary>
+    private bool _isPaused = false;
+
     private void Start()
     {
         //各必要なクラスのインスタンス化（以下）
@@ -95,7 +98,7 @@ public class PlayerController : MonoBehaviour
         this._playerHand = GameObject.FindGameObjectWithTag("Player_Hand");//フラッシュライトのオブジェクトの検索
 
         this._cursoreLocker = new MouseCursoreLocker();//マウスカーソルのロック用クラス使用
-        this._cursoreLocker.MouseCursoreLock();//マウスカーソルのロック
+        this._cursoreLocker.MouseCursorLock();//マウスカーソルのロック
 
         this._flashLightController = new FlashLightController();//懐中電灯の操作クラス
         this._playerMover = new PlayerMover();//プレイヤーの操作クラス
@@ -171,13 +174,14 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        this._uiSystemForHorrorGame._objectiveTextController.OutPutTextToDisplay("サキヲメザセ(^ ^@)");
+        this._uiSystemForHorrorGame._objectiveTextController.OutPutTextToDisplay("サキヲメザセ(^ ^@)");//set objective text
     }
 
     private void Update()
     {
         this._uiSystemForHorrorGame._hpProgBarController.ModifyProgressValue(1f);
-        this._uiSystemForHorrorGame._hpProgBarController.ModifyTitle("体力だにょ～ん");
+        this._uiSystemForHorrorGame._hpProgBarController.ModifyTitle("体力だにょ～ん");//set health text
+        PauseGame(this._isPaused);
     }
 
     private void FixedUpdate()
@@ -245,8 +249,25 @@ public class PlayerController : MonoBehaviour
     /// <param name="context"></param>
     public void OnReload(InputAction.CallbackContext context)
     {
-        this._reloadNow = context.ReadValueAsButton();//キーボードEの入力値を格納
+        this._reloadNow = context.ReadValueAsButton();//キーボードRの入力値を格納
         //Debug.Log("pikkedNOW" + _pickkingNow);
+    }
+
+    /// <summary>
+    /// 一時停止の入力があった場合
+    /// </summary>
+    /// <param name="context"></param>
+    public void OnPaused(InputAction.CallbackContext context)
+    {
+        //Tabキー入力値の格納
+        if (this._isPaused)
+        {
+            this._isPaused = false;
+        }
+        else
+        {
+            this._isPaused = true;
+        }
     }
 
     private void OnTriggerStay(Collider other)
@@ -334,6 +355,22 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
+    public void PauseGame(bool isPausedGame)
+    {
+        this._uiSystemForHorrorGame._pausedTextController.SetVisible(isPausedGame);
+        this._uiSystemForHorrorGame._backtoTitleButtonChecker.SetVisible(isPausedGame);
+        if (isPausedGame)
+        {
+            Time.timeScale = 0;
+            this._cursoreLocker.MouseCursorUnLock();
+        }
+        else
+        {
+            Time.timeScale = 1;
+            this._cursoreLocker.MouseCursorLock();
+        }
+    }
 }
 
 /// <summary>
@@ -372,7 +409,12 @@ public class PlayerLooker
 /// </summary>
 public class MouseCursoreLocker
 {
-    public void MouseCursoreLock()
+    public void MouseCursorUnLock()
+    {
+        Cursor.lockState = CursorLockMode.None;
+    }
+
+    public void MouseCursorLock()
     {
         Cursor.lockState = CursorLockMode.Locked;
     }

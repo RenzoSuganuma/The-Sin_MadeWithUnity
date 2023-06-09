@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 /// <summary>
 /// Unity UIToolkit対応版のクラス 2023/06/06
@@ -22,7 +23,13 @@ public class UISystemForHorrorGame : MonoBehaviour
     /// <summary> 目標表示のクラス </summary>
     public ObjectiveTextController _objectiveTextController;
 
-    private void Start()
+    /// <summary> 一時停止テキストの表示クラス </summary>
+    public PausedTextController _pausedTextController;
+
+    /// <summary> タイトルに戻るボタンの管理クラス </summary>
+    public BacktoTitleButtonChecker _backtoTitleButtonChecker;
+
+    private void Awake()
     {
         if (GetComponent<UIDocument>() != null)//UIDocumenを取得出来たらそのまま取得
         {
@@ -32,6 +39,8 @@ public class UISystemForHorrorGame : MonoBehaviour
             this._itemTextController = new ItemTextController(_document.rootVisualElement);
             this._itemPickedTextController = new ItemPickedTextController(_document.rootVisualElement);
             this._objectiveTextController = new ObjectiveTextController(_document.rootVisualElement);
+            this._pausedTextController = new PausedTextController(_document.rootVisualElement);
+            this._backtoTitleButtonChecker = new BacktoTitleButtonChecker(_document.rootVisualElement);
         }
     }
 
@@ -118,5 +127,54 @@ public class ObjectiveTextController
     public void OutPutTextToDisplay(string title)
     {
         this._label.text = title;
+    }
+}
+
+public class PausedTextController
+{
+    private UnityEngine.UIElements.Label _label;
+    public PausedTextController(VisualElement root)
+    {
+        this._label = root.Q<UnityEngine.UIElements.Label>("PausedLabel");//()内の文字列はNameでバインドされている文字列
+        //初期化
+        this._label.visible = false;
+    }
+
+    public void SetVisible(bool isVisible)
+    {
+        this._label.visible = isVisible;
+    }
+}
+
+public sealed class BacktoTitleButtonChecker
+{
+    private readonly UnityEngine.UIElements.Button _button;
+    private bool _calledTitleScene = false;
+
+    public BacktoTitleButtonChecker(VisualElement root)//Buttonの宣言があいまいなため
+    {
+        _button = root.Q<UnityEngine.UIElements.Button>("BackToMainMenuButton");
+        _button.clicked += buttonClicked;
+        this._button.visible = false;
+    }
+
+    private void buttonClicked()
+    {
+        Debug.Log(_button.text);
+        BackToTitleClickedNow();
+    }
+
+    public void SetVisible(bool isVisible)
+    {
+        this._button.visible = isVisible;
+    }
+
+    private void BackToTitleClickedNow()
+    {
+        if (!this._calledTitleScene)
+        {
+            SetVisible(false);
+            SceneManager.LoadScene("StartMenu");
+        }
     }
 }
