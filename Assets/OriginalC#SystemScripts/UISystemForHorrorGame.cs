@@ -29,6 +29,8 @@ public class UISystemForHorrorGame : MonoBehaviour
     /// <summary> タイトルに戻るボタンの管理クラス </summary>
     public BacktoTitleButtonChecker _backtoTitleButtonChecker;
 
+    public DiyingWillController _diyingWillController;
+
     private void Awake()
     {
         if (GetComponent<UIDocument>() != null)//UIDocumenを取得出来たらそのまま取得
@@ -41,6 +43,7 @@ public class UISystemForHorrorGame : MonoBehaviour
             this._objectiveTextController = new ObjectiveTextController(_document.rootVisualElement);
             this._pausedTextController = new PausedTextController(_document.rootVisualElement);
             this._backtoTitleButtonChecker = new BacktoTitleButtonChecker(_document.rootVisualElement);
+            this._diyingWillController = new DiyingWillController(this._document.rootVisualElement);
         }
     }
 
@@ -176,5 +179,32 @@ public sealed class BacktoTitleButtonChecker
             SetVisible(false);
             SceneManager.LoadScene("StartMenu");
         }
+    }
+}
+
+public class DiyingWillController
+{
+    private UnityEngine.UIElements.Label _label;
+    public DiyingWillController(VisualElement root)
+    {
+        this._label = root.Q<UnityEngine.UIElements.Label>("DiyingWillLabel");//()内の文字列はNameでバインドされている文字列
+        this._label.text = "遺言";
+        //初期化
+        this._label.visible = false;
+    }
+
+    public void OutputTextToDisplay(string text)
+    {
+        this._label.text = text;
+    }
+
+    public void SetVisible(bool isVisible)
+    {
+        this._label.visible = isVisible;
+    }
+
+    public bool GetVisible()
+    {
+        return this._label.visible;
     }
 }

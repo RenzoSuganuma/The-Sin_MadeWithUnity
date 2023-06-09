@@ -117,7 +117,7 @@ public class InventrySystem : MonoBehaviour
     /// <param name="parentObject"></param>
     /// <param name="objectTag"></param>
     /// <returns></returns>
-    public GameObject GetRandomChildObjectWithTag(GameObject parentObject, string objectTag)
+    public GameObject GetRandomlyChildObjectWithTag(GameObject parentObject, string objectTag)
     {
         // 子オブジェクトを格納する配列作成
         GameObject[] _returnObjects = new GameObject[parentObject.transform.childCount];//添え字が変動する step2

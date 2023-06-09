@@ -12,6 +12,8 @@ TagManager:
   - Inventry_Poach
   - Player_Hand
   - Diary
+  - UI
+  - IntaractableDoor
   layers:
   - Default
   - TransparentFX
