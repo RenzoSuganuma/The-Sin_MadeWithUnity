@@ -294,8 +294,19 @@
                 },
                 {
                     "name": "",
+                    "id": "78ba4e33-25fa-43bc-9002-c92e7efeab01",
+                    "path": "<XInputController>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "5260b3d1-0a04-4e61-b6d2-4a08d9be82a9",
-                    "path": "<Keyboard>/r",
+                    "path": "<XInputController>/buttonWest",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -310,6 +321,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
+                    "action": "PauseGame",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8f4b3ae1-8dcf-4bab-b972-857b53f30c43",
+                    "path": "<XInputController>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
                     "action": "PauseGame",
                     "isComposite": false,
                     "isPartOfComposite": false

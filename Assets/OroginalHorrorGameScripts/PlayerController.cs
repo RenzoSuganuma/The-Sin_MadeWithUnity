@@ -179,13 +179,13 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        this._uiSystemForHorrorGame._objectiveTextController.OutPutTextToDisplay("サキヲメザセ(^ ^@)");//set objective text
+        this._uiSystemForHorrorGame._objectiveTextController.OutPutTextToDisplay("電池ヲ集メツツ\n出口トツナガッテル廊下ヲ歩ケ");//set objective text
     }
 
     private void Update()
     {
         this._uiSystemForHorrorGame._hpProgBarController.ModifyProgressValue(1f);
-        this._uiSystemForHorrorGame._hpProgBarController.ModifyTitle("体力だにょ～ん");//set health text
+        this._uiSystemForHorrorGame._hpProgBarController.ModifyTitle("罪悪感");//set health text
         PauseGame(this._isPaused);
     }
 
@@ -198,7 +198,7 @@ public class PlayerController : MonoBehaviour
         this._playerMover.PlayerMove(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
         this._playerLooker.PlayerLooking(this.gameObject.transform, this._lookVector, this._lookSpeed);//振り向き
         this._flashLightController.FlushLightLight(this._light, this._illuminate, this._usingBatteryNow);//懐中電灯のONOFF
-        this._playerCameraController.PlayerCameraMove(this._playerCamera, this._lookVector, this._lookSpeed, 45f);//カメラ上下回転
+        this._playerCameraController.PlayerCameraMove(this._playerCamera, this._lookVector, this._lookSpeed * 2, 45f);//カメラ上下回転
         this._walkingSoundEffectController.WalkingSoundEffectPlayStatusSet(this._walkingSoundEffectObject, this._moveVector);//歩行効果音操
     }
 

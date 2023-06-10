@@ -89,23 +89,24 @@ public class HorrorMainMenuUISystem : MonoBehaviour
 
         this._groupBoxSettings = root.Q<UnityEngine.UIElements.GroupBox>("GroupBox_All_Settings");//各種設定画面のグルボックス
         this._groupBoxSettings.visible = false;
-
+        /*
         this._groupBoxLoadingScene = root.Q<UnityEngine.UIElements.GroupBox>("GroupBox_All_SceneLoading");//シーンロード画面のグルボックス
         this._groupBoxLoadingScene.visible = false;
+        */
     }
 
     public void SelectMainGroupBox()//メインメニュー画面のグルボックス
     {
         this._groupBoxMain.visible = true;
         this._groupBoxSettings.visible = false;
-        this._groupBoxLoadingScene.visible = false;
+        //this._groupBoxLoadingScene.visible = false;
     }
 
     public void SelectSettingsGroupBox()//各種設定画面のグルボックス
     {
         this._groupBoxSettings.visible = true;
         this._groupBoxMain.visible = false;
-        this._groupBoxLoadingScene.visible = false;
+        //this._groupBoxLoadingScene.visible = false;
     }
 
     public void MoveToGameSceneFirst(VisualElement root)
