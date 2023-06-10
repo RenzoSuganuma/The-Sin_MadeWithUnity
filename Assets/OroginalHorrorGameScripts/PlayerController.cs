@@ -410,12 +410,13 @@ public class PlayerController : MonoBehaviour
 
     public void PauseGame(bool isPausedGame)
     {
-        this._uiSystemForHorrorGame._pausedTextController.SetVisible(isPausedGame);
-        this._uiSystemForHorrorGame._backtoTitleButtonChecker.SetVisible(isPausedGame);
+        this._uiSystemForHorrorGame._pausedTextController.SetVisible(isPausedGame);//一時停止のテキストを可視化
+        this._uiSystemForHorrorGame._backtoTitleButtonChecker.SetVisible(isPausedGame);//ゲームプレイに戻るボタンの可視化
+
         if (isPausedGame)
         {
-            Time.timeScale = 0;
-            this._cursoreLocker.MouseCursorUnLock();
+            Time.timeScale = 0;//一時停止
+            this._cursoreLocker.MouseCursorUnLock();//カーソルのロック解除
         }
         else
         {

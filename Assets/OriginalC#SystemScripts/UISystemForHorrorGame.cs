@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 /// <summary>
@@ -29,6 +30,7 @@ public class UISystemForHorrorGame : MonoBehaviour
     /// <summary> タイトルに戻るボタンの管理クラス </summary>
     public BacktoTitleButtonChecker _backtoTitleButtonChecker;
 
+    /// <summary> 遺言の管理クラス </summary>
     public DiyingWillController _diyingWillController;
 
     private void Awake()
