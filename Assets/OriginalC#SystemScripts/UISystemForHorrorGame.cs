@@ -81,6 +81,15 @@ public sealed class HPProgressBarController
     {
         this._progressBar.value += deltaValue;
     }
+
+    /// <summary>
+    /// プログレスバーに値を代入する
+    /// </summary>
+    /// <param name="value"></param>
+    public void UpdateProgressValue(float value)
+    {
+        this._progressBar.value = value;
+    }
 }
 
 /// <summary>

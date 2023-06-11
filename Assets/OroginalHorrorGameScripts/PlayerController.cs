@@ -65,6 +65,12 @@ public class PlayerController : MonoBehaviour
     /// <summary> 使用中の電池オブジェクト </summary>
     GameObject _usingBatteryNow;
 
+    /// <summary> プレイヤーステータス管理オブジェクト </summary>
+    [SerializeField] private GameObject _playerManagerObject = null;
+
+    /// <summary> プレイヤーステータス管理クラス </summary>
+    PlayerStatusManager _statusManager;
+
     //以下プレイヤーの操作に必要なクラス
     PlayerMover _playerMover;//プレイヤーの移動用クラス
     PlayerLooker _playerLooker;//Player振り向き用クラス
@@ -153,12 +159,19 @@ public class PlayerController : MonoBehaviour
         else
             Debug.LogError("The Component InventrySystem Is Not Found");
 
-        if (TryGetComponent<GamePadVibrationControllerSystem>(out GamePadVibrationControllerSystem component))
+        if (TryGetComponent<GamePadVibrationControllerSystem>(out GamePadVibrationControllerSystem vibrationSystem))
         {
-            this._gamePadVibrationControllerSystem = component;
+            this._gamePadVibrationControllerSystem = vibrationSystem;
         }
         else
             Debug.LogError("The Component GamePadVibrationControllerSystem Is Not Found");
+
+        if (this._playerManagerObject.TryGetComponent<PlayerStatusManager>(out PlayerStatusManager statusManager))
+        {
+            this._statusManager = statusManager;
+        }
+        else
+            Debug.LogError("The Component PlayerStatusManager Is Not Found");
 
         if (this._uiGameObject != null)//UIのオブジェクトがアタッチされてるかチェック
         {
@@ -194,8 +207,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        this._uiSystemForHorrorGame._hpProgBarController.ModifyProgressValue(1f);
-        this._uiSystemForHorrorGame._hpProgBarController.ModifyTitle("罪悪感");//set health text
+        this._uiSystemForHorrorGame._hpProgBarController.ModifyTitle("体力");//set health text
         PauseGame(this._isPaused);
     }
 
@@ -292,6 +304,11 @@ public class PlayerController : MonoBehaviour
             if (other.gameObject.CompareTag("Spector_Enemy"))
             {
                 this._gamePadVibrationControllerSystem.GamepadViverateRapid(30, 3);//ゲームパッドの振動をする
+                //UIとマネージャにアクセスして値の修正
+                {
+                    this._statusManager.ModifyHealth(-10f);
+                    this._uiSystemForHorrorGame._hpProgBarController.UpdateProgressValue(this._statusManager.GetCurrentHealth());
+                }
             }
         }
     }
