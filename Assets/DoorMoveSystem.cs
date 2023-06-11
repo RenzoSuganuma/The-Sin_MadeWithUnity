@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// ニゲラレナイ のドアを空けるために使うクラス
+/// ニゲラレナイ のドアを空けるために使うクラス 使い捨て。つかいまわしNG
 /// </summary>
 public class DoorMoveSystem : MonoBehaviour
 {

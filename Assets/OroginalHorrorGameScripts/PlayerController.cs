@@ -95,6 +95,9 @@ public class PlayerController : MonoBehaviour
     /// <summary> インタラクト可能なドアのクラス </summary>
     DoorMoveSystem _doorMoveSystem;
 
+    /// <summary> ゲームパッド振動操作クラス </summary>
+    GamePadVibrationControllerSystem _gamePadVibrationControllerSystem;
+
     private void Start()
     {
         //各必要なクラスのインスタンス化（以下）このスクリプトの直下のクラスたち
@@ -150,7 +153,14 @@ public class PlayerController : MonoBehaviour
         else
             Debug.LogError("The Component InventrySystem Is Not Found");
 
-        if(this._uiGameObject != null)//UIのオブジェクトがアタッチされてるかチェック
+        if (TryGetComponent<GamePadVibrationControllerSystem>(out GamePadVibrationControllerSystem component))
+        {
+            this._gamePadVibrationControllerSystem = component;
+        }
+        else
+            Debug.LogError("The Component GamePadVibrationControllerSystem Is Not Found");
+
+        if (this._uiGameObject != null)//UIのオブジェクトがアタッチされてるかチェック
         {
             if (this._uiGameObject.TryGetComponent<UISystemForHorrorGame>(out UISystemForHorrorGame uiSystemForHorrorGame))
             {
@@ -275,6 +285,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject != null)
+        {
+            if (other.gameObject.CompareTag("Spector_Enemy"))
+            {
+                this._gamePadVibrationControllerSystem.GamepadViverateRapid(30, 3);//ゲームパッドの振動をする
+            }
+        }
+    }
+
     private void OnTriggerStay(Collider other)
     {
         if (TriggeredObjectCheckToPickUp(other.gameObject))//アイテムポーチに格納できるものか判定
@@ -303,9 +324,9 @@ public class PlayerController : MonoBehaviour
                 if (other.gameObject.CompareTag("Diary"))
                 {
                     this._diyingWillTextContainer = other.gameObject.GetComponent<DiyingWillTextContainer>();//遺言格納のデータにアクセス
-                    this._uiSystemForHorrorGame._diyingWillController.OutputTextToDisplay(this._diyingWillTextContainer._text);//画面出力
+                    this._uiSystemForHorrorGame._diyingWillController.OutputTextToDisplay(this._diyingWillTextContainer.GetText());//画面出力
                     this._uiSystemForHorrorGame._diyingWillController.SetVisible(true);//可視化
-                    //Debug.Log($"DEBUG-LOG:DIYING-WILL:TEST-OUTPUT{this._diyingWillTextContainer._text}");SUCCED
+                    Debug.Log($"DEBUG-LOG:DIYING-WILL:TEST-OUTPUT{this._diyingWillTextContainer.GetText()}");
                 }
             }
         }
@@ -424,6 +445,8 @@ public class PlayerController : MonoBehaviour
             this._cursoreLocker.MouseCursorLock();
         }
     }
+
+
 }
 
 /// <summary>

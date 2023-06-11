@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using UnityEngine.UIElements;
 /// <summary>
 /// Unity UIToolkit‘Î‰ž”Å‚ÌƒNƒ‰ƒX 2023/06/06

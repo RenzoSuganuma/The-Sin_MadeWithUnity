@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 /// <summary>
@@ -48,13 +47,11 @@ public class UISystemForHorrorGame : MonoBehaviour
             this._diyingWillController = new DiyingWillController(this._document.rootVisualElement);
         }
     }
-
-    private void Update()
-    {
-        
-    }
 }
 
+/// <summary>
+/// HPバーの管理クラス
+/// </summary>
 public sealed class HPProgressBarController
 {
     private UnityEngine.UIElements.ProgressBar _progressBar;
@@ -86,6 +83,9 @@ public sealed class HPProgressBarController
     }
 }
 
+/// <summary>
+/// 拾えるアイテム名を表示するクラス
+/// </summary>
 public class ItemTextController
 {
     private UnityEngine.UIElements.Label _label;
@@ -103,6 +103,9 @@ public class ItemTextController
     }
 }
 
+/// <summary>
+/// 拾ったアイテム名を表示するクラス
+/// </summary>
 public class ItemPickedTextController
 {
     private UnityEngine.UIElements.Label _label;
@@ -119,6 +122,9 @@ public class ItemPickedTextController
     }
 }
 
+/// <summary>
+/// 目標を表示するクラス
+/// </summary>
 public class ObjectiveTextController
 {
     private UnityEngine.UIElements.Label _label;
@@ -135,6 +141,9 @@ public class ObjectiveTextController
     }
 }
 
+/// <summary>
+/// 一時停止時のテキストを表示する
+/// </summary>
 public class PausedTextController
 {
     private UnityEngine.UIElements.Label _label;
@@ -151,6 +160,9 @@ public class PausedTextController
     }
 }
 
+/// <summary>
+/// タイトルに戻るボタンの管理クラス
+/// </summary>
 public sealed class BacktoTitleButtonChecker
 {
     private readonly UnityEngine.UIElements.Button _button;
@@ -184,6 +196,9 @@ public sealed class BacktoTitleButtonChecker
     }
 }
 
+/// <summary>
+/// 遺言のテキストにアクセスするクラス
+/// </summary>
 public class DiyingWillController
 {
     private UnityEngine.UIElements.Label _label;
