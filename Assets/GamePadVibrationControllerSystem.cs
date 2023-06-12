@@ -22,6 +22,9 @@ public class GamePadVibrationControllerSystem : MonoBehaviour
     /// </summary>
     public bool _isVivrate = false;
 
+    /// <summary>
+    /// シーン読み込み時にゲームパッドの振動を止める
+    /// </summary>
     [SerializeField] bool _forceStopViverate = false;
 
     private void Start()
