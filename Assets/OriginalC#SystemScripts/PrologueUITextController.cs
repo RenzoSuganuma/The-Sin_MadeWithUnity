@@ -33,11 +33,6 @@ public class PrologueUITextController : MonoBehaviour
     /// </summary>
     private string[] _outPutTextArray = null;
 
-    /// <summary>
-    /// ”z—ñ‚Ì“Y‚¦š
-    /// </summary>
-    private int _arrayIndex = 0;
-
     private void Awake()
     {
         if (GetComponent<UIDocument>() != null)//UIDocumen‚ğæ“¾o—ˆ‚½‚ç‚»‚Ì‚Ü‚Üæ“¾
