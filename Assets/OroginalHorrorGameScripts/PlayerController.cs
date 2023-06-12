@@ -39,6 +39,9 @@ public class PlayerController : MonoBehaviour
     /// <summary> 移動速度float型引数 </summary>
     [Tooltip("振り向き速度float型引数")]
     [SerializeField] private float _lookSpeed = 1.0f;
+    /// <summary> 移動速度float型引数 </summary>
+    [Tooltip("スタミナfloat型引数")]
+    [SerializeField] private float _stamina = 1.0f;
 
     /// <summary> プレイヤーのカメラのオブジェクト </summary>
     GameObject _playerCamera;
@@ -103,6 +106,9 @@ public class PlayerController : MonoBehaviour
 
     /// <summary> ゲームパッド振動操作クラス </summary>
     GamePadVibrationControllerSystem _gamePadVibrationControllerSystem;
+
+    /// <summary> 走っているかのフラグ </summary>
+    private bool _isRunning = false;
 
     private void Start()
     {
@@ -208,6 +214,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         PauseGame(this._isPaused);
+        Debug.Log($"stamina is {this._stamina}");
     }
 
     private void FixedUpdate()
@@ -215,8 +222,26 @@ public class PlayerController : MonoBehaviour
         SetUsingBattery();//使用するバッテリーを選択
         
         { this._flashLightIsOn = this._illuminate; }//ほかクラスから懐中電灯のステータスをスコープするため
+        #region 移動速度の変更の判定
+        if (this._isRunning)
+        {
+            Debug.Log($"stamina bool is{StaminaModify(-Time.deltaTime)}");
+            if(StaminaModify(-Time.deltaTime))
+                this._playerMover.PlayerMove(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed * 2f);//移動
+            else
+                this._isRunning = false;
+        }
+        else
+        {
+            this._playerMover.PlayerMove(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
+        }
 
-        this._playerMover.PlayerMove(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
+        if (this._moveVector == Vector2.zero && this._stamina < 100)//立ち止まっていればスタミナ回復
+        {
+            this._stamina += Time.deltaTime;
+        }
+        #endregion
+
         this._playerLooker.PlayerLooking(this.gameObject.transform, this._lookVector, this._lookSpeed);//振り向き
         this._flashLightController.FlushLightLight(this._light, this._illuminate, this._usingBatteryNow);//懐中電灯のONOFF
         this._light.intensity = this._flashLightController.GetBatteryLife();//懐中電灯の光の強さの更新
@@ -295,6 +320,15 @@ public class PlayerController : MonoBehaviour
         {
             this._isPaused = true;
         }
+    }
+
+    /// <summary>
+    /// 走る入力があった場合
+    /// </summary>
+    /// <param name="context"></param>
+    public void OnRun(InputAction.CallbackContext context)
+    {
+        this._isRunning = context.ReadValueAsButton();//キーボードL-Shiftの入力値を格納
     }
 
     private void OnTriggerEnter(Collider other)
@@ -446,6 +480,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 一時停止関数
+    /// </summary>
+    /// <param name="isPausedGame"></param>
     public void PauseGame(bool isPausedGame)
     {
         this._uiSystemForHorrorGame._pausedTextController.SetVisible(isPausedGame);//一時停止のテキストを可視化
@@ -461,6 +499,18 @@ public class PlayerController : MonoBehaviour
             Time.timeScale = 1;
             this._cursoreLocker.MouseCursorLock();
         }
+    }
+
+    /// <summary>
+    /// スタミナの補正をしてもし０以上ならtrueを返す
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public bool StaminaModify(float value)
+    {
+        this._stamina += value;
+        if(this._stamina >= 0) return true;
+        else return false;
     }
 }
 

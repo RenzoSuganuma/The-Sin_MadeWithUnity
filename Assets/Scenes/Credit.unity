@@ -557,7 +557,7 @@ PrefabInstance:
         type: 3}
       propertyPath: sourceAsset
       value: 
-      objectReference: {fileID: 9197481963319205126, guid: 0f7a817d7e8bfe94c946e55ce6ae5515,
+      objectReference: {fileID: 9197481963319205126, guid: 1e9e159d38e101e43a9754f62d93c78c,
         type: 3}
     m_RemovedComponents:
     - {fileID: 324815261072152856, guid: b0c43f932816fa945bed0ca9a4f093fa, type: 3}
@@ -580,7 +580,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a428d71353845644b390e9b79dbe37b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _textAsset: {fileID: 4900000, guid: 09c7a9fdf64c79747b801529769684ae, type: 3}
+  _textAsset: {fileID: 4900000, guid: e266620ce6cb23f41bc0f23ad41f1093, type: 3}
 --- !u!1 &1722317972
 GameObject:
   m_ObjectHideFlags: 0
