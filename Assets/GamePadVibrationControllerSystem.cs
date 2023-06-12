@@ -22,10 +22,17 @@ public class GamePadVibrationControllerSystem : MonoBehaviour
     /// </summary>
     public bool _isVivrate = false;
 
+    [SerializeField] bool _forceStopViverate = false;
+
     private void Start()
     {
         if(Gamepad.current != null)//null check
             _gamepad = Gamepad.current;
+
+        if (this._forceStopViverate)
+        {
+            StopGamepadViverate();
+        }
     }
 
     /// <summary>
@@ -45,6 +52,11 @@ public class GamePadVibrationControllerSystem : MonoBehaviour
     public void GamepadViverate(int frames)
     {
         StartCoroutine(VivrateTheGamepadLongNow(frames));
+    }
+
+    public void StopGamepadViverate()
+    {
+        _gamepad.SetMotorSpeeds(0f, 0f); // 振動を停止します
     }
 
     #region 振動：ブッブッ

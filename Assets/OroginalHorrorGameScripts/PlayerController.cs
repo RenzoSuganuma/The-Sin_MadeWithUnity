@@ -207,7 +207,6 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        this._uiSystemForHorrorGame._hpProgBarController.ModifyTitle("体力");//set health text
         PauseGame(this._isPaused);
     }
 
@@ -220,6 +219,7 @@ public class PlayerController : MonoBehaviour
         this._playerMover.PlayerMove(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
         this._playerLooker.PlayerLooking(this.gameObject.transform, this._lookVector, this._lookSpeed);//振り向き
         this._flashLightController.FlushLightLight(this._light, this._illuminate, this._usingBatteryNow);//懐中電灯のONOFF
+        this._light.intensity = this._flashLightController.GetBatteryLife();//懐中電灯の光の強さの更新
         this._playerCameraController.PlayerCameraMove(this._playerCamera, this._lookVector, this._lookSpeed * 2, 45f);//カメラ上下回転
         this._walkingSoundEffectController.WalkingSoundEffectPlayStatusSet(this._walkingSoundEffectObject, this._moveVector);//歩行効果音操
     }
@@ -301,13 +301,12 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject != null)
         {
-            if (other.gameObject.CompareTag("Spector_Enemy"))
+            if (other.gameObject.CompareTag("Spector_Enemy") || other.gameObject.CompareTag("SpectorBoss_Enemy"))
             {
-                this._gamePadVibrationControllerSystem.GamepadViverateRapid(30, 3);//ゲームパッドの振動をする
-                //UIとマネージャにアクセスして値の修正
+                if (this._statusManager.GetCurrentHealth() > 0)
                 {
-                    this._statusManager.ModifyHealth(-10f);
-                    this._uiSystemForHorrorGame._hpProgBarController.UpdateProgressValue(this._statusManager.GetCurrentHealth());
+                    this._gamePadVibrationControllerSystem.GamepadViverateRapid(30, 3);//ゲームパッドの振動をする
+                    this._statusManager.ModifyHealth(-30);//体力の補正
                 }
             }
         }
@@ -341,6 +340,7 @@ public class PlayerController : MonoBehaviour
                 if (other.gameObject.CompareTag("Diary"))
                 {
                     this._diyingWillTextContainer = other.gameObject.GetComponent<DiyingWillTextContainer>();//遺言格納のデータにアクセス
+                    this._uiSystemForHorrorGame._diyingWillController.OutputTextToDisplay("");//画面出力
                     this._uiSystemForHorrorGame._diyingWillController.OutputTextToDisplay(this._diyingWillTextContainer.GetText());//画面出力
                     this._uiSystemForHorrorGame._diyingWillController.SetVisible(true);//可視化
                     Debug.Log($"DEBUG-LOG:DIYING-WILL:TEST-OUTPUT{this._diyingWillTextContainer.GetText()}");
@@ -351,9 +351,9 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        this._uiSystemForHorrorGame._itemTextController.OutPutTextToDisplay($"");//拾えるアイテム名を表示していたものを非表示にする
+        this._uiSystemForHorrorGame._itemTextController.OutPutTextToDisplay(" ");//拾えるアイテム名を表示していたものを非表示にする
         Debug.Log($"UI Visible{this._uiSystemForHorrorGame._diyingWillController.GetVisible()}");
-        this._uiSystemForHorrorGame._diyingWillController.OutputTextToDisplay($"");//画面出力初期化何もない文字列にする
+        this._uiSystemForHorrorGame._diyingWillController.OutputTextToDisplay(" ");//画面出力初期化何もない文字列にする
         this._uiSystemForHorrorGame._diyingWillController.SetVisible(false);//遺言の非表示
     }
 
@@ -462,8 +462,6 @@ public class PlayerController : MonoBehaviour
             this._cursoreLocker.MouseCursorLock();
         }
     }
-
-
 }
 
 /// <summary>

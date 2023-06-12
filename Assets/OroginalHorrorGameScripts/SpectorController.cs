@@ -29,11 +29,25 @@ public class SpectorController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        this.gameObject.transform.LookAt(this._playerGameObject.transform.position, this._playerGameObject.transform.up);//プレイヤーオブジェクトを向く
-        if(this._isMadNow)
-            this._rb.AddForce(this.transform.forward * .3f, ForceMode.VelocityChange);//正面に移動
-        else
-            this._rb.velocity = this.transform.forward * .6f;//正面に移動
+        Debug.Log($"distance is {Vector3.Distance(this.gameObject.transform.position, this._playerGameObject.transform.position)}");
+        if (Vector3.Distance(this.gameObject.transform.position,this._playerGameObject.transform.position) > 2f)//距離が1以上のとき
+        {
+            this.gameObject.transform.LookAt(this._playerGameObject.transform.position, this._playerGameObject.transform.up);//プレイヤーオブジェクトを向く
+            if (this._isMadNow)
+                this._rb.AddForce(this.transform.forward * .5f, ForceMode.VelocityChange);//正面に移動
+            else
+                this._rb.velocity = this.transform.forward * 3f;//正面に移動
+        }
+        else//1より近い時にはプレイヤーを向かない
+        {
+            if (this._isMadNow)
+            {
+
+                this._rb.AddForce(this.transform.forward * .3f, ForceMode.VelocityChange);//正面に移動
+            }
+            else
+                this._rb.velocity = this.transform.forward * .6f;//正面に移動
+        }
         //Debug.Log(_isMadNow);
     }
 

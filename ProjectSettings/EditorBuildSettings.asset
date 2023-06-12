@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/StartMenu.unity
     guid: deafc9e5873f1884587c353a0062a1b3
   - enabled: 1
+    path: Assets/Scenes/Prologue.unity
+    guid: db393d8b8dc08974fa00f902362943cd
+  - enabled: 1
     path: Assets/Scenes/FirstStage.unity
     guid: 5e8319b16b5b6cf4b9b75a836d1032e2
   m_configObjects: {}

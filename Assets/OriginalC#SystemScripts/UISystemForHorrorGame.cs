@@ -11,9 +11,6 @@ public class UISystemForHorrorGame : MonoBehaviour
     /// <summary> 同じ階層のUIDocument </summary>
     UIDocument _document;
 
-    /// <summary> HPのプログバーのクラス </summary>
-    public HPProgressBarController _hpProgBarController;
-
     /// <summary> アイテム名表示のクラス </summary>
     public ItemTextController _itemTextController;
 
@@ -38,7 +35,6 @@ public class UISystemForHorrorGame : MonoBehaviour
         {
             _document = GetComponent<UIDocument>();
             //public のクラスに代入
-            this._hpProgBarController = new HPProgressBarController(_document.rootVisualElement);
             this._itemTextController = new ItemTextController(_document.rootVisualElement);
             this._itemPickedTextController = new ItemPickedTextController(_document.rootVisualElement);
             this._objectiveTextController = new ObjectiveTextController(_document.rootVisualElement);
@@ -46,49 +42,6 @@ public class UISystemForHorrorGame : MonoBehaviour
             this._backtoTitleButtonChecker = new BacktoTitleButtonChecker(_document.rootVisualElement);
             this._diyingWillController = new DiyingWillController(this._document.rootVisualElement);
         }
-    }
-}
-
-/// <summary>
-/// HPバーの管理クラス
-/// </summary>
-public sealed class HPProgressBarController
-{
-    private UnityEngine.UIElements.ProgressBar _progressBar;
-
-    public HPProgressBarController(VisualElement root)
-    {
-        this._progressBar = root.Q<UnityEngine.UIElements.ProgressBar>("HPBar");//()内の文字列はNameでバインドされている文字列
-        //値の初期化
-        this._progressBar.lowValue = 0f;
-        this._progressBar.highValue = 100f;
-    }
-
-    /// <summary>
-    /// ゲーム画面に表示される文字列のモディファイ
-    /// </summary>
-    /// <param name="title"></param>
-    public void ModifyTitle(string title)
-    {
-        this._progressBar.title = title;
-    }
-
-    /// <summary>
-    /// プログレスバーの値のモディファイ
-    /// </summary>
-    /// <param name="deltaValue"></param>
-    public void ModifyProgressValue(float deltaValue)
-    {
-        this._progressBar.value += deltaValue;
-    }
-
-    /// <summary>
-    /// プログレスバーに値を代入する
-    /// </summary>
-    /// <param name="value"></param>
-    public void UpdateProgressValue(float value)
-    {
-        this._progressBar.value = value;
     }
 }
 
