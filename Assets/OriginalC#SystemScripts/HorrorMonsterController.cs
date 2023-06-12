@@ -38,6 +38,9 @@ public class HorrorMonsterController : MonoBehaviour
     [SerializeField] float _sightRange, _attackRange;
     [SerializeField] bool _playerFound, _playerCanAttack;
 
+    //プレイヤーに投げつけるオブジェクト
+    [SerializeField] GameObject _orb;
+
     private void Awake()
     {
         if(GameObject.FindGameObjectWithTag("Player").transform !=  null)
@@ -101,7 +104,11 @@ public class HorrorMonsterController : MonoBehaviour
         if (!this._isAttacked)
         {
             #region 攻撃処理
-
+            GameObject orb = Instantiate(this._orb);
+            orb.transform.position = this.gameObject.transform.position;
+            Rigidbody rigidbody = orb.GetComponent<Rigidbody>();
+            rigidbody.velocity = (this._playerTransform.position - this.gameObject.transform.position) * 10;
+            Destroy(orb, 1f);
             #endregion
 
             //攻撃処理をしたので攻撃をしたフラグを立てる
