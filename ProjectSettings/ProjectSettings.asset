@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: DiscoveryGameWorks
-  productName: "\u7F6A - TheSin"
+  productName: "\u8D16\u3044 - The Sin"
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.3962264, g: 0.35408062, b: 0.31959772, a: 1}

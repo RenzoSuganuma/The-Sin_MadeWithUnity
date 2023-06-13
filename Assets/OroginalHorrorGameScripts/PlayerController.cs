@@ -340,7 +340,7 @@ public class PlayerController : MonoBehaviour
                 if (this._statusManager.GetCurrentHealth() > 0)
                 {
                     this._gamePadVibrationControllerSystem.GamepadViverateRapid(30, 3);//ゲームパッドの振動をする
-                    this._statusManager.ModifyHealth(-30);//体力の補正
+                    this._statusManager.ModifyHealth(-15);//体力の補正
                 }
             }
         }
