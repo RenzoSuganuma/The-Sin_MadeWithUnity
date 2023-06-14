@@ -72,24 +72,30 @@ public class GamePadVibrationControllerSystem : MonoBehaviour
     /// <returns></returns>
     IEnumerator VivrateTheGamepadRapidlyNow(int frames, int repeat)
     {
-        this._isVivrate = true;//U“®’†ƒtƒ‰ƒO 1
-
-        for (int timeCount = 0; timeCount < repeat; timeCount++)
+        if (this._gamepad != null)
         {
-            for (int cnt = 0; cnt < frames; cnt++)
-            {
-                _gamepad.SetMotorSpeeds(this._motorMinFrecuency, this._motorMaxFrecuency); // U“®‚Ì‹­‚³‚ğİ’è‚µ‚Ü‚·
-                    yield return null;
-            }_gamepad.SetMotorSpeeds(0f, 0f); // U“®‚ğ’â~‚µ‚Ü‚·
+            this._isVivrate = true;//U“®’†ƒtƒ‰ƒO 1
 
-            for (int cnt = 0; cnt < 3; cnt++)
+            for (int timeCount = 0; timeCount < repeat; timeCount++)
             {
+                for (int cnt = 0; cnt < frames; cnt++)
+                {
+                    _gamepad.SetMotorSpeeds(this._motorMinFrecuency, this._motorMaxFrecuency); // U“®‚Ì‹­‚³‚ğİ’è‚µ‚Ü‚·
+                    yield return null;
+                }
                 _gamepad.SetMotorSpeeds(0f, 0f); // U“®‚ğ’â~‚µ‚Ü‚·
-                    yield return null;
-            }_gamepad.SetMotorSpeeds(0f, 0f); // U“®‚ğ’â~‚µ‚Ü‚·
-        }
 
-        this._isVivrate = false;//U“®’†ƒtƒ‰ƒO 0
+                for (int cnt = 0; cnt < 3; cnt++)
+                {
+                    _gamepad.SetMotorSpeeds(0f, 0f); // U“®‚ğ’â~‚µ‚Ü‚·
+                    yield return null;
+                }
+                _gamepad.SetMotorSpeeds(0f, 0f); // U“®‚ğ’â~‚µ‚Ü‚·
+            }
+
+            this._isVivrate = false;//U“®’†ƒtƒ‰ƒO 0
+        }
+        
     }
     #endregion
 
@@ -101,23 +107,27 @@ public class GamePadVibrationControllerSystem : MonoBehaviour
     /// <returns></returns>
     IEnumerator VivrateTheGamepadLongNow(int frames)
     {
-        this._isVivrate = true;//U“®’†ƒtƒ‰ƒO 1
-
-        for (int cnt = 0; cnt < frames; cnt++)
+        if (this._gamepad != null)
         {
-            _gamepad.SetMotorSpeeds(this._motorMinFrecuency, this._motorMaxFrecuency); // U“®‚Ì‹­‚³‚ğİ’è‚µ‚Ü‚·
-            yield return null;
-        }
-        _gamepad.SetMotorSpeeds(0f, 0f); // U“®‚ğ’â~‚µ‚Ü‚·
+            this._isVivrate = true;//U“®’†ƒtƒ‰ƒO 1
 
-        for (int cnt = 0; cnt < 5; cnt++)
-        {
+            for (int cnt = 0; cnt < frames; cnt++)
+            {
+                _gamepad.SetMotorSpeeds(this._motorMinFrecuency, this._motorMaxFrecuency); // U“®‚Ì‹­‚³‚ğİ’è‚µ‚Ü‚·
+                yield return null;
+            }
             _gamepad.SetMotorSpeeds(0f, 0f); // U“®‚ğ’â~‚µ‚Ü‚·
-            yield return null;
-        }
-        _gamepad.SetMotorSpeeds(0f, 0f); // U“®‚ğ’â~‚µ‚Ü‚·
 
-        this._isVivrate = false;//U“®’†ƒtƒ‰ƒO 0
+            for (int cnt = 0; cnt < 5; cnt++)
+            {
+                _gamepad.SetMotorSpeeds(0f, 0f); // U“®‚ğ’â~‚µ‚Ü‚·
+                yield return null;
+            }
+            _gamepad.SetMotorSpeeds(0f, 0f); // U“®‚ğ’â~‚µ‚Ü‚·
+
+            this._isVivrate = false;//U“®’†ƒtƒ‰ƒO 0
+        }
+       
     }
     #endregion
 }

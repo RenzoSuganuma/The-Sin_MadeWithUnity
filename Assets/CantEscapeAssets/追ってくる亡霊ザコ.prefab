@@ -9,12 +9,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4818873299786310837}
-  - component: {fileID: 562346858411392043}
   - component: {fileID: 1510372167320880035}
   - component: {fileID: 3850899530794695461}
+  - component: {fileID: 3225257291522609554}
+  - component: {fileID: 1934156000}
   m_Layer: 0
-  m_Name: Spector_Enemy
-  m_TagString: Spector_Enemy
+  m_Name: "\u8FFD\u3063\u3066\u304F\u308B\u4EA1\u970A\u30B6\u30B3"
+  m_TagString: SpectorBoss_Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -35,20 +36,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &562346858411392043
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2433230123069820099}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89fad7f494fd68041be1f3fbdbd7c54f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _isMadNow: 1
-  _deathEffect: {fileID: 0}
 --- !u!54 &1510372167320880035
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -78,6 +65,59 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3225257291522609554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2433230123069820099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1fb2a4cd78984441983ef8c4fd909bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _navMesh: {fileID: 0}
+  _playerTransform: {fileID: 0}
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  _playerLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  _health: 100
+  _movePoint: {x: 3, y: 0, z: 3}
+  _movePointRange: 100
+  _intervalAttack: 1
+  _sightRange: 5
+  _attackRange: 1
+  _playerFound: 0
+  _playerCanAttack: 0
+  _orb: {fileID: 373233864332087444, guid: 6b2f14f4c73210249a199b83c15aa967, type: 3}
+  _patrollBGM: {fileID: 0}
+  _chaseBGM: {fileID: 0}
+--- !u!195 &1934156000
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2433230123069820099}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 4
+  m_Acceleration: 3
+  avoidancePriority: 50
+  m_AngularSpeed: 100
+  m_StoppingDistance: 0.5
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 1
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &8405915934846464700
 GameObject:
   m_ObjectHideFlags: 0

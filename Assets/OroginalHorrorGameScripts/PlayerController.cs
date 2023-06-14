@@ -513,6 +513,15 @@ public class PlayerController : MonoBehaviour
         if(this._stamina >= 0) return true;
         else return false;
     }
+
+    /// <summary>
+    /// エディターのシーン上で補足しやすくするため
+    /// </summary>
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(this.gameObject.transform.position, 5f);
+    }
 }
 
 /// <summary>

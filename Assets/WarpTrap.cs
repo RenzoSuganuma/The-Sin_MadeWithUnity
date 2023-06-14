@@ -22,4 +22,12 @@ public class WarpTrap : MonoBehaviour
             }
         }
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireCube(this.gameObject.transform.position, Vector3.one * 5);
+        Gizmos.color = Color.grey;
+        Gizmos.DrawWireCube(this._transformTarget.gameObject.transform.position, Vector3.one * 5);
+    }
 }

@@ -19,4 +19,10 @@ public class DiyingWillTextContainer : MonoBehaviour
     {
         return this._text;
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(this.gameObject.transform.position, 2);
+    }
 }

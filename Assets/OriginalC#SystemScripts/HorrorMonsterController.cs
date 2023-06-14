@@ -41,6 +41,12 @@ public class HorrorMonsterController : MonoBehaviour
     //プレイヤーに投げつけるオブジェクト
     [SerializeField] GameObject _orb;
 
+    //徘徊中のBGM
+    [SerializeField] GameObject _patrollBGM;
+
+    //追跡中BGM
+    [SerializeField] GameObject _chaseBGM;
+
     private void Awake()
     {
         if(GameObject.FindGameObjectWithTag("Player").transform !=  null)
@@ -52,6 +58,9 @@ public class HorrorMonsterController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        //プレイヤーとの距離を出力
+        Debug.Log($"Enemy Between Player Dis Is{Vector3.Distance(this.gameObject.transform.position,this._playerTransform.position)}");
+
         //攻撃か補足範囲の検索
         this._playerFound = Physics.CheckSphere(this.gameObject.transform.position, this._sightRange, this._playerLayer);
         this._playerCanAttack = Physics.CheckSphere(this.gameObject.transform.position, this._attackRange, this._playerLayer);
@@ -76,6 +85,10 @@ public class HorrorMonsterController : MonoBehaviour
 
         if(distance.magnitude > 1)
             this._movePointIsSet = false;//移動するフラグを外す
+
+        //BGMの設定
+        this._patrollBGM.SetActive(true);
+        this._chaseBGM.SetActive(false);
     }
     void SearchMovePoint()
     {
@@ -91,6 +104,11 @@ public class HorrorMonsterController : MonoBehaviour
 
     void ChaseWithPlayer()
     {
+        //BGMの設定
+        this._patrollBGM.SetActive(false);
+        this._chaseBGM.SetActive(true);
+
+        //プレイヤーの追尾
         this._navMesh.SetDestination(this._playerTransform.position);
     }
 
@@ -143,5 +161,11 @@ public class HorrorMonsterController : MonoBehaviour
         Gizmos.DrawWireSphere(this.transform.position, this._attackRange);//攻撃範囲のギズモを描写
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(this.transform.position, this._sightRange);//補足範囲のギズモを描写
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.black;
+        Gizmos.DrawWireCube(this.gameObject.transform.position, Vector3.one * 10);
     }
 }

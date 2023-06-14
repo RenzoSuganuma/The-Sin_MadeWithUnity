@@ -22,4 +22,10 @@ public class JumpToCreditManager : MonoBehaviour
             yield return null;
         }
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(this.transform.position, Vector3.one * 10);
+    }
 }
