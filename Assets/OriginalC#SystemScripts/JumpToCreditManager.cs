@@ -13,6 +13,7 @@ public class JumpToCreditManager : MonoBehaviour
             StartCoroutine(LoadScene());
         }
     }
+
     IEnumerator LoadScene()
     {
         AsyncOperation async = SceneManager.LoadSceneAsync("Credit");

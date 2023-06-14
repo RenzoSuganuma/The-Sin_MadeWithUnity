@@ -59,7 +59,8 @@ public class GamePadVibrationControllerSystem : MonoBehaviour
 
     public void StopGamepadViverate()
     {
-        _gamepad.SetMotorSpeeds(0f, 0f); // U“®‚ğ’â~‚µ‚Ü‚·
+        if(this._gamepad != null)
+            _gamepad.SetMotorSpeeds(0f, 0f); // U“®‚ğ’â~‚µ‚Ü‚·
     }
 
     #region U“®Fƒuƒbƒuƒb

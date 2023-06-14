@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent (typeof(PlayerInput))]
@@ -30,6 +31,7 @@ public class PlayerController : MonoBehaviour
 
     /// <summary> Lightコンポーネント　ここではプレイヤーの懐中電灯のコンポーネント </summary>
     Light _light;
+
     /// <summary> プレイヤーの懐中電灯のオブジェクト </summary>
     GameObject _flashLight;
 
@@ -207,13 +209,12 @@ public class PlayerController : MonoBehaviour
                 break; // 条件を満たすオブジェクトが見つかったらループを終了
             }
         }
-
         this._uiSystemForHorrorGame._objectiveTextController.OutPutTextToDisplay("電池ヲ集メツツ\n出口トツナガッテル廊下ヲ歩ケ");//set objective text
     }
 
     private void Update()
     {
-        PauseGame(this._isPaused);
+        PauseGame(this._isPaused);//一時停止チェック
         Debug.Log($"stamina is {this._stamina}");
     }
 
@@ -584,14 +585,6 @@ public class FlashLightController
             Debug.Log($"current battery is death");
         }
     }
-
-    /*
-    public void FlashLightBatteryCharge(float batteryPower)
-    {
-        this._batteryLife = batteryPower;//バッテリーの寿命の回復をする
-        Debug.Log($"battery charged");
-    }
-    */
 
     public float GetBatteryLife()
     {
