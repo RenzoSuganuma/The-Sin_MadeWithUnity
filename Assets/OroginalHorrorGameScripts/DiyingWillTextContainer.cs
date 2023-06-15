@@ -8,7 +8,8 @@ using UnityEngine;
 public class DiyingWillTextContainer : MonoBehaviour
 {
     [SerializeField] private TextAsset _textAsset;
-    [SerializeField] private string _text;
+    public string _text;
+    public bool _showText = false;
 
     private void Awake()
     {

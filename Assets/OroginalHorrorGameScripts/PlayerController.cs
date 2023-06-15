@@ -74,7 +74,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject _playerManagerObject = null;
 
     /// <summary> プレイヤーステータス管理クラス </summary>
-    PlayerStatusManager _statusManager;
+    GameManager _statusManager;
 
     //以下プレイヤーの操作に必要なクラス
     PlayerMover _playerMover;//プレイヤーの移動用クラス
@@ -160,7 +160,7 @@ public class PlayerController : MonoBehaviour
         else
             Debug.LogError("The Component GamePadVibrationControllerSystem Is Not Found");
 
-        if (this._playerManagerObject.TryGetComponent<PlayerStatusManager>(out PlayerStatusManager statusManager))
+        if (this._playerManagerObject.TryGetComponent<GameManager>(out GameManager statusManager))
         {
             this._statusManager = statusManager;
         }
@@ -241,6 +241,8 @@ public class PlayerController : MonoBehaviour
         this._light.intensity = this._flashLightController.GetBatteryLife();//懐中電灯の光の強さの更新
         this._playerCameraController.PlayerCameraMove(this._playerCamera, this._lookVector, this._lookSpeed * 2, 45f);//カメラ上下回転
         this._walkingSoundEffectController.WalkingSoundEffectPlayStatusSet(this._walkingSoundEffectObject, this._moveVector);//歩行効果音操
+        //重力
+        this._characterController.Move(Vector3.down * 9);
     }
 
     /// <summary>
@@ -375,7 +377,8 @@ public class PlayerController : MonoBehaviour
                     this._uiSystemForHorrorGame._diyingWillController.OutputTextToDisplay("");//画面出力
                     this._uiSystemForHorrorGame._diyingWillController.OutputTextToDisplay(this._diyingWillTextContainer.GetText());//画面出力
                     this._uiSystemForHorrorGame._diyingWillController.SetVisible(true);//可視化
-                    Debug.Log($"DEBUG-LOG:DIYING-WILL:TEST-OUTPUT{this._diyingWillTextContainer.GetText()}");
+                    this._diyingWillTextContainer._showText = true;//見たことを代入
+                     //Debug.Log($"DEBUG-LOG:DIYING-WILL:TEST-OUTPUT{this._diyingWillTextContainer.GetText()}");
                 }
             }
         }
@@ -385,8 +388,15 @@ public class PlayerController : MonoBehaviour
     {
         this._uiSystemForHorrorGame._itemTextController.OutPutTextToDisplay(" ");//拾えるアイテム名を表示していたものを非表示にする
         Debug.Log($"UI Visible{this._uiSystemForHorrorGame._diyingWillController.GetVisible()}");
-        this._uiSystemForHorrorGame._diyingWillController.OutputTextToDisplay(" ");//画面出力初期化何もない文字列にする
-        this._uiSystemForHorrorGame._diyingWillController.SetVisible(false);//遺言の非表示
+        if (other.gameObject.CompareTag("Diary"))
+        {
+            this._uiSystemForHorrorGame._diyingWillController.OutputTextToDisplay(" ");//画面出力初期化何もない文字列にする
+            this._uiSystemForHorrorGame._diyingWillController.SetVisible(false);//遺言の非表示
+            if (other.gameObject.GetComponent<DiyingWillTextContainer>()._showText)
+            {
+                Destroy(other.gameObject,1);//画面の出力されていた文字列を初期化、何もないものにしてからゲームオブジェクトの破棄。VFXGraph使ってるのでおそらく重い。
+            }
+        }
     }
 
     /// <summary>
