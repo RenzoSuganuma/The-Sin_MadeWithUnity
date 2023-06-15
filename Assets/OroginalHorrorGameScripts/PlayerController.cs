@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     PlayerInput _playerInput;
 
     /// <summary> キャラ移動に使う </summary>
-    Rigidbody _rigidbody = default;
+    CharacterController _characterController;
 
     /// <summary> キャラ移動に使うコライダー </summary>
     CapsuleCollider _capsuleCollider = default;
@@ -136,21 +136,7 @@ public class PlayerController : MonoBehaviour
         else
             Debug.LogError("The Component PlayerInput Is Not Found");
 
-        if (TryGetComponent<Rigidbody>(out Rigidbody rigid))//Digidbodyコンポーネントがあるかチェック、あるならゲットする
-        {
-            this._rigidbody = rigid;//入手したコンポーネントの送信
-            //各パラメーターの初期化
-            this._rigidbody.mass = 1.0f;
-            this._rigidbody.drag = 1.5f;
-            this._rigidbody.angularDrag = .05f;
-            this._rigidbody.useGravity = true;
-            this._rigidbody.isKinematic = false;
-            this._rigidbody.freezeRotation = true;
-        }
-        else
-            Debug.LogError("The Component Rigidbody Is Not Found");
-
-        if (TryGetComponent<CapsuleCollider>(out CapsuleCollider capsule))//Digidbodyコンポーネントがあるかチェック、あるならゲットする
+        if (TryGetComponent<CapsuleCollider>(out CapsuleCollider capsule))//コンポーネントがあるかチェック、あるならゲットする
         {
             //各パラメーターの初期化
             this._capsuleCollider = capsule;
@@ -181,6 +167,13 @@ public class PlayerController : MonoBehaviour
         else
             Debug.LogError("The Component PlayerStatusManager Is Not Found");
 
+        if (this.gameObject.TryGetComponent<CharacterController>(out CharacterController characterController))
+        {
+            this._characterController = characterController;
+        }
+        else
+            Debug.LogError("The Component CharacterController Is Not Found");
+
         if (this._uiGameObject != null)//UIのオブジェクトがアタッチされてるかチェック
         {
             if (this._uiGameObject.TryGetComponent<UISystemForHorrorGame>(out UISystemForHorrorGame uiSystemForHorrorGame))
@@ -198,7 +191,7 @@ public class PlayerController : MonoBehaviour
         else
             Debug.LogError("The Component Light Is Not Found");
 
-                { this._playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera"); }
+        { this._playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera"); }
 
         this._compareTagSoundEffect = GameObject.FindGameObjectsWithTag("SoundEffect");//効果音用のタグがアタッチされているオブジェクト（配列）を検索
         foreach (GameObject @object in this._compareTagSoundEffect)//ボトムからトップまでの要素のチェック
@@ -228,13 +221,13 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log($"stamina bool is{StaminaModify(-Time.deltaTime)}");
             if(StaminaModify(-Time.deltaTime))
-                this._playerMover.PlayerMove(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed * 2f);//移動
+                this._playerMover.PlayerMove(this.gameObject, this._characterController, this._moveVector, this._moveSpeed * 1.5f);//移動
             else
                 this._isRunning = false;
         }
         else
         {
-            this._playerMover.PlayerMove(this.gameObject, this._rigidbody, this._moveVector, this._moveSpeed);//移動
+            this._playerMover.PlayerMove(this.gameObject, this._characterController, this._moveVector, this._moveSpeed);//移動
         }
 
         if (this._moveVector == Vector2.zero && this._stamina < 100)//立ち止まっていればスタミナ回復
@@ -336,13 +329,17 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject != null)
         {
-            if (other.gameObject.CompareTag("Spector_Enemy") || other.gameObject.CompareTag("SpectorBoss_Enemy"))
+            if (other.gameObject.CompareTag("SpectorBoss_Enemy"))
             {
                 if (this._statusManager.GetCurrentHealth() > 0)
                 {
                     this._gamePadVibrationControllerSystem.GamepadViverateRapid(30, 3);//ゲームパッドの振動をする
-                    this._statusManager.ModifyHealth(-15);//体力の補正
+                    this._statusManager.ModifyHealth(-100);//体力の補正
                 }
+            }
+            else if (other.gameObject.CompareTag("Spector_Enemy"))
+            {
+                this._gamePadVibrationControllerSystem.GamepadViverateRapid(30, 5);//ゲームパッドの振動をする
             }
         }
     }
@@ -529,18 +526,10 @@ public class PlayerController : MonoBehaviour
 /// </summary>
 public class PlayerMover
 {
-    public void PlayerMove(GameObject playerObject, Rigidbody rigidbody, Vector2 moveVector, float moveSpeed)
+    public void PlayerMove(GameObject playerObject, CharacterController characterController, Vector2 moveVector, float moveSpeed)
     {
-        if (moveVector != Vector2.zero)
-        {
-            rigidbody.WakeUp();//何かしらの入力値があった力を加える
-            rigidbody.AddForce(playerObject.transform.forward * moveVector.y * moveSpeed * .01f, ForceMode.Impulse);//前後の移動　正面が変動するのでその時々の正面基準で動く
-            rigidbody.AddForce(playerObject.transform.right * moveVector.x * moveSpeed * .01f, ForceMode.Impulse);//左右の移動　正面が変動するのでその時々の正面基準で動く
-        }
-        else
-        {
-            rigidbody.Sleep();//何も入力値がないので力は加えない
-        }
+        characterController.Move(playerObject.transform.forward * moveVector.y * moveSpeed * .01f);//
+        characterController.Move(playerObject.transform.right * moveVector.x * moveSpeed * .01f);//
     }
 }
 
