@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using JetBrains.Annotations;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent (typeof(PlayerInput))]
@@ -395,8 +396,16 @@ public class PlayerController : MonoBehaviour
             if (other.gameObject.GetComponent<DiyingWillTextContainer>()._showText)
             {
                 Destroy(other.gameObject,1);//画面の出力されていた文字列を初期化、何もないものにしてからゲームオブジェクトの破棄。VFXGraph使ってるのでおそらく重い。
+                StartCoroutine(TextFormatter(1));
             }
         }
+    }
+
+    IEnumerator TextFormatter(int seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        this._uiSystemForHorrorGame._itemTextController.OutPutTextToDisplay(" ");//拾えるアイテム名を表示していたものを非表示にする
+        this._uiSystemForHorrorGame._diyingWillController.OutputTextToDisplay(" ");//画面出力初期化何もない文字列にする
     }
 
     /// <summary>
