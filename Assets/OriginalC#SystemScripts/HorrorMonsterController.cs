@@ -25,6 +25,16 @@ public class HorrorMonsterController : MonoBehaviour
     /// </summary>
     [SerializeField] float _health = 0;
 
+    /// <summary>
+    /// 処刑人のアニメーター
+    /// </summary>
+    Animator _animator;
+
+    /// <summary>
+    /// 処刑人かの判定
+    /// </summary>
+    [SerializeField] bool _iamExecutioner;
+
     //徘徊
     [SerializeField] Vector3 _movePoint = Vector3.zero;
     bool _movePointIsSet = false;
@@ -54,6 +64,9 @@ public class HorrorMonsterController : MonoBehaviour
 
         if (this.gameObject.GetComponent<NavMeshAgent>() != null)
             this._navMesh = this.gameObject.GetComponent<NavMeshAgent>();//NavMeshのコンポーネント取得
+
+        if(this.gameObject.GetComponent<Animator>() != null && this._iamExecutioner)
+            this._animator = this.gameObject.GetComponent<Animator>();//Animatorのコンポーネント取得
     }
 
     private void FixedUpdate()
@@ -80,15 +93,28 @@ public class HorrorMonsterController : MonoBehaviour
 
         if(this._movePointIsSet)
             this._navMesh.SetDestination(this._movePoint);//見つけたらそこに向かう
+        //処刑人のアニメーション操作 追跡はプレイヤーを補足したときのみフラグが立つ
+        if (this._iamExecutioner)
+            this._animator.SetBool("isWalking", true);
 
         Vector3 distance = transform.position - _movePoint;//徘徊する目標の座標との距離
 
         if(distance.magnitude > 1)
             this._movePointIsSet = false;//移動するフラグを外す
+        //処刑人のアニメーション操作 追跡はプレイヤーを補足したときのみフラグが立つ
+        if (distance.magnitude > 1 && this._iamExecutioner)
+        {
+            this._animator.SetBool("isChasing", false);
+        }
 
         //BGMの設定
-        this._patrollBGM.SetActive(true);
-        this._chaseBGM.SetActive(false);
+        if (this._chaseBGM != null && this._patrollBGM != null)
+        {
+            this._patrollBGM.SetActive(true);
+            this._chaseBGM.SetActive(false);
+        }
+
+        Debug.Log("Walking");
     }
     void SearchMovePoint()
     {
@@ -105,11 +131,20 @@ public class HorrorMonsterController : MonoBehaviour
     void ChaseWithPlayer()
     {
         //BGMの設定
-        this._patrollBGM.SetActive(false);
-        this._chaseBGM.SetActive(true);
+        if (this._chaseBGM != null && this._patrollBGM != null)
+        {
+            this._patrollBGM.SetActive(false);
+            this._chaseBGM.SetActive(true);
+        }
 
         //プレイヤーの追尾
         this._navMesh.SetDestination(this._playerTransform.position);
+        //処刑人のアニメーション操作
+        if (this._iamExecutioner)
+        {
+            this._animator.SetBool("isChasing", true);
+            this._animator.SetBool("isWalking", false);
+        }
     }
 
     void AttackPlayerNow()
@@ -122,11 +157,14 @@ public class HorrorMonsterController : MonoBehaviour
         if (!this._isAttacked)
         {
             #region 攻撃処理
-            GameObject orb = Instantiate(this._orb);
-            orb.transform.position = this.gameObject.transform.position;
-            Rigidbody rigidbody = orb.GetComponent<Rigidbody>();
-            rigidbody.velocity = (this._playerTransform.position - this.gameObject.transform.position) * 10;
-            Destroy(orb, 1f);
+            if (this._orb != null)
+            {
+                GameObject orb = Instantiate(this._orb);
+                orb.transform.position = this.gameObject.transform.position;
+                Rigidbody rigidbody = orb.GetComponent<Rigidbody>();
+                rigidbody.velocity = (this._playerTransform.position - this.gameObject.transform.position) * 10;
+                Destroy(orb, 1f);
+            }
             #endregion
 
             //攻撃処理をしたので攻撃をしたフラグを立てる
