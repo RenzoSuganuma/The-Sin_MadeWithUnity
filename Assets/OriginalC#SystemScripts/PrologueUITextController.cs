@@ -26,7 +26,15 @@ public class PrologueUITextController : MonoBehaviour
     /// </summary>
     TextController _textController;
 
+    /// <summary>
+    /// スキップするボタンのクラス
+    /// </summary>
     SkipPrologueButtonChecker _skipPrologueButtonChecker;
+
+    /// <summary>
+    /// ゲームパッドの振動コントロールのクラス
+    /// </summary>
+    GamePadVibrationControllerSystem _gamePadVibrationControllerSystem;
 
     /// <summary>
     /// 出力する文字列の配列
@@ -42,8 +50,13 @@ public class PrologueUITextController : MonoBehaviour
             this._skipPrologueButtonChecker = new SkipPrologueButtonChecker(_uiDocument.rootVisualElement);
 
             this._outPutTextArray = this._textAsset.text.Split("_");//スプリット
-            this._textController.UpdateText(this._outPutTextArray[0]);//アウトプット
+            //this._textController.UpdateText(this._outPutTextArray[0]);//アウトプット
             Debug.Log($"array length {this._outPutTextArray.Length}");
+        }
+
+        if (GetComponent<GamePadVibrationControllerSystem>() != null)//ゲームパッドの振動コントローラーを取得出来たらそのまま取得
+        {
+            this._gamePadVibrationControllerSystem = GetComponent<GamePadVibrationControllerSystem>();
         }
     }
 
@@ -56,7 +69,7 @@ public class PrologueUITextController : MonoBehaviour
     {
         for (int i = 0; i < arrayLength; i++)
         {
-            this._textController.UpdateText(this._outPutTextArray[i]);//アウトプット
+            this._textController.UpdateText(this._outPutTextArray[i],this._gamePadVibrationControllerSystem);//アウトプット
             yield return new WaitForSeconds(3);
         }
         yield return null;
@@ -76,17 +89,56 @@ public class PrologueUITextController : MonoBehaviour
 
 public class TextController
 {
-    private UnityEngine.UIElements.Label _label;
+    private UnityEngine.UIElements.Label _label, _emphasisLabel;
     public TextController(VisualElement root)
     {
         this._label = root.Q<UnityEngine.UIElements.Label>("Prologue_Label");
+        this._emphasisLabel = root.Q<UnityEngine.UIElements.Label>("Prologue_Label_Emphasis");
 
-        this._label.text = string.Empty;
+        this._label.text = string.Empty;//通常
+        this._emphasisLabel.text = string.Empty;//強調
+        this._emphasisLabel.visible = false;//非可視
     }
 
     public void UpdateText(string text)
     {
-        this._label.text = text;
+        if (text.StartsWith("|"))
+        {
+            this._emphasisLabel.visible = true;//可視化
+            this._label.visible = false;//非可視
+            this._emphasisLabel.text = text.Replace("|", "");//出力
+        }
+        else
+        {
+            this._label.visible = true;//可視化
+            this._emphasisLabel.visible = false;//非可視
+            this._label.text = text;//出力
+        }
+    }
+
+    public void UpdateText(string text, GamePadVibrationControllerSystem gamePadVibrationControllerSystem)
+    {
+        if (text.StartsWith("|"))//強調表示の時
+        {
+            this._emphasisLabel.visible = true;//可視化
+            this._label.visible = false;//非可視
+            this._emphasisLabel.text = text.Replace("|", "");//出力
+        }
+        else if (text.StartsWith("^"))//振動表現があったとき宇
+        {
+            text = text.Replace("^", "");//^を消して詰める
+            gamePadVibrationControllerSystem.GamepadViverateRapid(30, 2);//ゲームパッド振動
+
+            this._label.visible = true;//可視化
+            this._emphasisLabel.visible = false;//非可視
+            this._label.text = text;//出力
+        }
+        else//そのどちらでもない通常表示の時
+        {
+            this._label.visible = true;//可視化
+            this._emphasisLabel.visible = false;//非可視
+            this._label.text = text;//出力
+        }
     }
 }
 

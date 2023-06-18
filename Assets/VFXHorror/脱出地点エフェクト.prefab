@@ -81,11 +81,20 @@ VisualEffect:
   m_ResourceVersion: 1
   m_PropertySheet:
     m_Float:
-      m_Array: []
+      m_Array:
+      - m_Value: 5
+        m_Name: Time_Scale
+        m_Overridden: 1
     m_Vector2f:
       m_Array: []
     m_Vector3f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: 0.5, y: 1.2, z: 0.5}
+        m_Name: Spark_Scale
+        m_Overridden: 1
+      - m_Value: {x: 1, y: 1, z: 1}
+        m_Name: Particle_Scale
+        m_Overridden: 0
     m_Vector4f:
       m_Array: []
     m_Uint:
@@ -97,7 +106,38 @@ VisualEffect:
     m_AnimationCurve:
       m_Array: []
     m_Gradient:
-      m_Array: []
+      m_Array:
+      - m_Value:
+          serializedVersion: 2
+          key0: {r: 0, g: 0, b: 0, a: 0}
+          key1: {r: 0.11569898, g: 0.006512091, b: 0, a: 1}
+          key2: {r: 0.3485102, g: 0.037909042, b: 0.005121276, a: 0}
+          key3: {r: 2, g: 0.3529412, b: 0, a: 0}
+          key4: {r: 1087.5884, g: 736.6397, b: 34.89178, a: 0}
+          key5: {r: 1087.5884, g: 736.6397, b: 34.89178, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 17926
+          ctime2: 30840
+          ctime3: 65535
+          ctime4: 65535
+          ctime5: 65535
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_NumColorKeys: 4
+          m_NumAlphaKeys: 2
+        m_Name: Particle_Gradient
+        m_Overridden: 1
     m_NamedObject:
       m_Array: []
     m_Bool:
