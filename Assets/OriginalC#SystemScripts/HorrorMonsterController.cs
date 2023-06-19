@@ -35,6 +35,11 @@ public class HorrorMonsterController : MonoBehaviour
     /// </summary>
     [SerializeField] bool _iamExecutioner;
 
+    /// <summary>
+    /// 追跡中かの判定
+    /// </summary>
+    [SerializeField] public bool _isChasing;
+
     //徘徊
     [SerializeField] Vector3 _movePoint = Vector3.zero;
     bool _movePointIsSet = false;
@@ -114,6 +119,9 @@ public class HorrorMonsterController : MonoBehaviour
             this._chaseBGM.SetActive(false);
         }
 
+        //追跡中フラグ設定
+        this._isChasing = false;
+
         Debug.Log("Walking");
     }
     void SearchMovePoint()
@@ -139,6 +147,8 @@ public class HorrorMonsterController : MonoBehaviour
 
         //プレイヤーの追尾
         this._navMesh.SetDestination(this._playerTransform.position);
+        this._isChasing = true;//追跡中フラグ設定
+
         //処刑人のアニメーション操作
         if (this._iamExecutioner)
         {

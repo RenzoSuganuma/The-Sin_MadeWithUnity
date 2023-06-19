@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     //敵キャラ（AI）
     [SerializeField] GameObject _enemyBossObject;
     [SerializeField] Transform[] _enemyBossSpawnPoint;
+    HorrorMonsterController _monsterController;
 
     //デバイス
     GamePadVibrationControllerSystem _vibrationControllerSystem;
@@ -29,10 +30,25 @@ public class GameManager : MonoBehaviour
         this._playerObject = GameObject.FindGameObjectWithTag("Player");
         //敵ボス検索
         this._enemyBossObject = GameObject.FindGameObjectWithTag("SpectorBoss_Enemy");
+        if (this._enemyBossObject.TryGetComponent<HorrorMonsterController>(out HorrorMonsterController horrorMonster))
+        {
+            this._monsterController = horrorMonster;
+        }
+        //ゲームパッド操作クラスの取得
+        this._vibrationControllerSystem = this._playerGamepadController.GetComponent<GamePadVibrationControllerSystem>();
     }
 
     private void Update()
     {
+        #region  プレイヤーがボスに補足されてる時の操作
+
+        if (this._monsterController._isChasing)
+        {
+            Debug.Log("BOSS IS CHASING!");
+            this._vibrationControllerSystem.GamepadViverate(180);
+        }
+        #endregion
+
         if (this._playerCurrentHealth <= 0)
         {
             #region  ゲームパッドの振動を止める
