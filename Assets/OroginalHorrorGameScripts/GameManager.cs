@@ -23,6 +23,9 @@ public class GameManager : MonoBehaviour
     //デバイス
     GamePadVibrationControllerSystem _vibrationControllerSystem;
 
+    //導光
+    [SerializeField] GameObject _guideLight;
+
     private void Awake()
     {
         this._playerCurrentHealth = this._playerMaxHealth;//体力の初期化
@@ -36,6 +39,8 @@ public class GameManager : MonoBehaviour
         }
         //ゲームパッド操作クラスの取得
         this._vibrationControllerSystem = this._playerGamepadController.GetComponent<GamePadVibrationControllerSystem>();
+        //導きの光を最初は非表示にする
+        this._guideLight.SetActive(false);
     }
 
     private void Update()
@@ -46,6 +51,28 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("BOSS IS CHASING!");
             this._vibrationControllerSystem.GamepadViverate(180);
+
+            //プレイヤーの検索
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                if (player.TryGetComponent<PlayerController>(out PlayerController controller))
+                {
+                    controller._playerObjective = "逃げろ！";
+                }
+            }
+        }
+        else
+        {
+            //プレイヤーの検索
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                if (player.TryGetComponent<PlayerController>(out PlayerController controller))
+                {
+                    controller._playerObjective = "電池ヲ集メツツ\n出口トツナガッテル廊下ヲ歩ケ";
+                }
+            }
         }
         #endregion
 
@@ -73,6 +100,20 @@ public class GameManager : MonoBehaviour
             this._playerCurrentHealth = 100;
             this._playerObject.transform.position = this._playerRestartposition.transform.position;
             this._playerObject.SetActive(true);
+            #endregion
+
+            //導きの光を一回死んだら表示
+            this._guideLight.SetActive(true);
+
+            #region  プレイヤーのスタミナを増やしてチェイスしやすくする
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                if (player.TryGetComponent<PlayerController>(out PlayerController controller))
+                {
+                    controller._stamina = 100f;
+                }
+            }
             #endregion
 
             //StartCoroutine(LoadScene());

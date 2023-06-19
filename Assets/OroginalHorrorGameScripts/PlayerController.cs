@@ -2,8 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using JetBrains.Annotations;
+
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent (typeof(PlayerInput))]
@@ -44,7 +43,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _lookSpeed = 1.0f;
     /// <summary> 移動速度float型引数 </summary>
     [Tooltip("スタミナfloat型引数")]
-    [SerializeField] private float _stamina = 1.0f;
+    [SerializeField] public float _stamina = 1.0f;
 
     /// <summary> プレイヤーのカメラのオブジェクト </summary>
     GameObject _playerCamera;
@@ -112,6 +111,9 @@ public class PlayerController : MonoBehaviour
 
     /// <summary> 走っているかのフラグ </summary>
     private bool _isRunning = false;
+
+    /// <summary> プレイヤーの目標 </summary>
+    public string _playerObjective;
 
     private void Start()
     {
@@ -203,7 +205,7 @@ public class PlayerController : MonoBehaviour
                 break; // 条件を満たすオブジェクトが見つかったらループを終了
             }
         }
-        this._uiSystemForHorrorGame._objectiveTextController.OutPutTextToDisplay("電池ヲ集メツツ\n出口トツナガッテル廊下ヲ歩ケ");//set objective text
+        this._playerObjective = "電池ヲ集メツツ\n出口トツナガッテル廊下ヲ歩ケ";//目標初期値
     }
 
     private void Update()
@@ -214,6 +216,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        this._uiSystemForHorrorGame._objectiveTextController.OutPutTextToDisplay(this._playerObjective);//目標の文字列を設定
+
         SetUsingBattery();//使用するバッテリーを選択
         
         { this._flashLightIsOn = this._illuminate; }//ほかクラスから懐中電灯のステータスをスコープするため
