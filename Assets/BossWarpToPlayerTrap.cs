@@ -18,6 +18,8 @@ public class BossWarpToPlayerTrap : MonoBehaviour
             this._bossObject.SetActive(false);
             this._bossObject.transform.position = this._targetTransform.position;
             this._bossObject.SetActive(true);
+
+            Destroy(this.gameObject);
         }
     }
 
