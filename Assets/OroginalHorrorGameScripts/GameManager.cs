@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
         //ゲームパッド操作クラスの取得
         this._vibrationControllerSystem = this._playerGamepadController.GetComponent<GamePadVibrationControllerSystem>();
         //導きの光を最初は非表示にする
-        this._guideLight.SetActive(false);
+        //this._guideLight.SetActive(false);
     }
 
     private void Update()
