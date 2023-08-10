@@ -29,6 +29,9 @@ public class UISystemForHorrorGame : MonoBehaviour
     /// <summary> 遺言の管理クラス </summary>
     public DiyingWillController _diyingWillController;
 
+    /// <summary> 感度のスライダー管理クラス /// </summary>
+    public SencetivitySliderController _sencetivitySliderController;
+
     private void Awake()
     {
         if (GetComponent<UIDocument>() != null)//UIDocumenを取得出来たらそのまま取得
@@ -41,6 +44,7 @@ public class UISystemForHorrorGame : MonoBehaviour
             this._pausedTextController = new PausedTextController(_document.rootVisualElement);
             this._backtoTitleButtonChecker = new BacktoTitleButtonChecker(_document.rootVisualElement);
             this._diyingWillController = new DiyingWillController(this._document.rootVisualElement);
+            this._sencetivitySliderController = new SencetivitySliderController(this._document.rootVisualElement);
         }
     }
 }
@@ -185,5 +189,35 @@ public class DiyingWillController
     public bool GetVisible()
     {
         return this._label.visible;
+    }
+}
+
+/// <summary>
+/// 視点移動感度用のスライダー
+/// </summary>
+public class SencetivitySliderController
+{
+    private UnityEngine.UIElements.Slider _slider;
+
+    public SencetivitySliderController(VisualElement root)
+    {
+        this._slider = root.Q<UnityEngine.UIElements.Slider>("SenceSlider");//感度のスライダー
+        //初期化
+        this._slider.visible = false;
+    }
+
+    public void SetSencitivity(ref float sence)
+    {
+        sence = this._slider.value;
+    }
+
+    public void SetVisible(bool visible)
+    {
+        this._slider.visible = visible;
+    }
+
+    public bool GetVisible()
+    {
+        return (this._slider.visible);
     }
 }
