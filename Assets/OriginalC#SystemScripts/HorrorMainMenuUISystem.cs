@@ -11,7 +11,7 @@ public class HorrorMainMenuUISystem : MonoBehaviour
     VisualTreeAsset _elementTemplate;
     UIDocument _document;
 
-    private  UnityEngine.UIElements.Button _startButton, _settingsButton, _quitButton, _backToMainMenu;
+    private  UnityEngine.UIElements.Button _startButton, _settingsButton, _quitButton, _backToMainMenu, _gotoProlougeButton;
 
     private  UnityEngine.UIElements.GroupBox _groupBoxMain, _groupBoxSettings, _groupBoxLoadingScene;
 
@@ -51,6 +51,9 @@ public class HorrorMainMenuUISystem : MonoBehaviour
 
             this._backToMainMenu = root.Q<UnityEngine.UIElements.Button>("Setting_BackToMainButton");//メインメニューに戻るボタン
             this._backToMainMenu.clicked += BackToMainMenuClicked;
+            
+            this._gotoProlougeButton = root.Q<UnityEngine.UIElements.Button>("Prolouge_Button");//プロローグに戻るボタン
+            this._gotoProlougeButton.clicked += GotoProlouge;
         }                                   /*GroupBox_All_Main*/
     }
 
@@ -77,6 +80,11 @@ public class HorrorMainMenuUISystem : MonoBehaviour
     {
         Debug.Log(_backToMainMenu.text);
         SelectMainGroupBox();
+    }
+
+    private void GotoProlouge()
+    {
+        StartCoroutine(LoadScene("Prologue"));
     }
 
 
@@ -115,13 +123,13 @@ public class HorrorMainMenuUISystem : MonoBehaviour
         this._groupBoxMain.visible = false;
         this._groupBoxSettings.visible = false;
         if(!this._calledNextScene)
-            StartCoroutine(LoadScene());
+            StartCoroutine(LoadScene("FirstStage"));
     }
 
-    IEnumerator LoadScene()
+    IEnumerator LoadScene(string scenename)
     {
         this._calledNextScene = true;
-        AsyncOperation async = SceneManager.LoadSceneAsync("FirstStage");
+        AsyncOperation async = SceneManager.LoadSceneAsync(scenename);
         while (!async.isDone)
         {
             this._sceneLoadingProgressBar.value = async.progress;
