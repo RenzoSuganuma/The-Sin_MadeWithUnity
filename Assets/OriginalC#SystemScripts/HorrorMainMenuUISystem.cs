@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -13,9 +12,13 @@ public class HorrorMainMenuUISystem : MonoBehaviour
 
     private  UnityEngine.UIElements.Button _startButton, _settingsButton, _quitButton, _backToMainMenu, _gotoProlougeButton;
 
-    private  UnityEngine.UIElements.GroupBox _groupBoxMain, _groupBoxSettings, _groupBoxLoadingScene;
+    private UnityEngine.UIElements.GroupBox _groupBoxMain, _groupBoxSettings;
+
+    private UnityEngine.UIElements.VisualElement _keyMouConfGrp, _xboxConfGrp;
 
     private  UnityEngine.UIElements.ProgressBar _sceneLoadingProgressBar;
+
+    private UnityEngine.UIElements.Toggle _configuePageSelect;
 
     private bool _calledNextScene = false;
 
@@ -35,6 +38,7 @@ public class HorrorMainMenuUISystem : MonoBehaviour
     private void Update()
     {
         ButtonInputChecker(_document.rootVisualElement);
+        ConfigueToggleCheck();
     }
 
     public void ButtonInputChecker(VisualElement root)//Buttonの宣言があいまいなため
@@ -84,7 +88,8 @@ public class HorrorMainMenuUISystem : MonoBehaviour
 
     private void GotoProlouge()
     {
-        StartCoroutine(LoadScene("Prologue"));
+        if (!this._calledNextScene)
+            StartCoroutine(LoadScene("Prologue"));
     }
 
 
@@ -95,16 +100,30 @@ public class HorrorMainMenuUISystem : MonoBehaviour
 
         this._groupBoxSettings = root.Q<UnityEngine.UIElements.GroupBox>("GroupBox_All_Settings");//各種設定画面のグルボックス
         this._groupBoxSettings.visible = false;
-        /*
-        this._groupBoxLoadingScene = root.Q<UnityEngine.UIElements.GroupBox>("GroupBox_All_SceneLoading");//シーンロード画面のグルボックス
-        this._groupBoxLoadingScene.visible = false;
-        */
+    }
+    public void ConfigueController(VisualElement root)
+    {
+        this._configuePageSelect = root.Q<UnityEngine.UIElements.Toggle>("ConfigueSelect");
+        this._keyMouConfGrp = root.Q<UnityEngine.UIElements.VisualElement>("KeyMouConfigueGroup");//各種設定画面のグルボックス
+        this._xboxConfGrp = root.Q<UnityEngine.UIElements.VisualElement>("XboxConfigueGroup");//各種設定画面のグルボックス
+        this._keyMouConfGrp.visible = true;
+        this._xboxConfGrp.visible = false;
+    }
+    public void ConfigueToggleCheck()
+    {
+        if (this._groupBoxSettings.visible)
+        {
+            Debug.Log($"TOGGLE{this._configuePageSelect.value}");
+            this._keyMouConfGrp.visible = !this._configuePageSelect.value;
+            this._xboxConfGrp.visible = this._configuePageSelect.value;
+        }
     }
 
     public void SelectMainGroupBox()//メインメニュー画面のグルボックス
     {
         this._groupBoxMain.visible = true;
         this._groupBoxSettings.visible = false;
+        this._keyMouConfGrp.visible = this._xboxConfGrp.visible = false;
         //this._groupBoxLoadingScene.visible = false;
     }
 
@@ -112,6 +131,7 @@ public class HorrorMainMenuUISystem : MonoBehaviour
     {
         this._groupBoxSettings.visible = true;
         this._groupBoxMain.visible = false;
+        ConfigueController(this._document.rootVisualElement);
         //this._groupBoxLoadingScene.visible = false;
     }
 
